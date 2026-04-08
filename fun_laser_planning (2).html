@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fun Laser — Planning</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --c-bg:#f5f4f0;--c-surface:#fff;--c-border:#e2e0d8;--c-text:#1a1916;--c-muted:#8a8880;
+    --c-s1:#fff3b0;--c-s1b:#d4b800;--c-s1t:#5c4d00;--c-s1h:#fef08a;
+    --c-s2:#dbeafe;--c-s2b:#3b82f6;--c-s2t:#1e3a8a;--c-s2h:#bfdbfe;
+    --c-br:#dcfce7;--c-brb:#16a34a;--c-brt:#14532d;--c-brh:#bbf7d0;
+    --c-an:#fce7f3;--c-anb:#ec4899;--c-ant:#831843;
+    --c-special:#f0e6ff;--c-specialb:#7c3aed;--c-specialt:#4c1d95;
+    --r:8px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--c-bg);color:var(--c-text);min-height:100vh;font-size:14px;}
+
+  .topbar{background:var(--c-text);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
+  .logo{font-weight:600;font-size:15px;flex:1;}.logo span{color:#facc15;}
+  .nav-btn{background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:4px;}
+  .nav-btn:hover{background:rgba(255,255,255,.15);}
+  .date-nav{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:var(--r);padding:4px 8px;}
+  .date-label{font-size:13px;font-weight:500;min-width:210px;text-align:center;white-space:nowrap;transition:opacity .15s;}
+  .date-label:hover{opacity:.75;}
+  .date-label::after{content:' 📅';font-size:11px;opacity:.5;}
+  .view-toggle{display:flex;background:rgba(255,255,255,.1);border-radius:var(--r);padding:3px;gap:2px;}
+  .vbtn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;padding:4px 10px;border-radius:5px;}
+  .vbtn.active{background:#fff;color:var(--c-text);}
+  .tbg{display:flex;gap:6px;flex-wrap:wrap;}
+  .abtn{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;cursor:pointer;font-size:12px;font-family:var(--font);padding:5px 10px;border-radius:var(--r);white-space:nowrap;}
+  .abtn:hover{background:rgba(255,255,255,.1);}
+  .abtn.special{border-color:#a78bfa;color:#c4b5fd;}
+  .abtn.special:hover{background:rgba(167,139,250,.15);}
+
+  .main{padding:14px;max-width:1100px;margin:0 auto;}
+  .closed-banner{border-radius:var(--r);padding:18px;text-align:center;font-weight:500;font-size:15px;margin-top:8px;}
+  .closed-banner.ferm{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+  .closed-banner.spec{background:var(--c-special);border:1px solid var(--c-specialb);color:var(--c-specialt);}
+  .special-badge{display:inline-flex;align-items:center;gap:6px;background:var(--c-special);border:1px solid var(--c-specialb);color:var(--c-specialt);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;margin-bottom:10px;cursor:pointer;}
+  .special-badge:hover{opacity:.85;}
+
+  .legend{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+  .li{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--c-muted);font-weight:500;}
+  .ld{width:13px;height:13px;border-radius:3px;}
+  .stats-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+  .sc{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r);padding:5px 11px;font-size:12px;}
+  .sc strong{font-weight:600;}
+
+  .day-table{width:100%;border-collapse:collapse;background:var(--c-surface);border-radius:var(--r);border:1px solid var(--c-border);overflow:hidden;}
+  .day-table th{padding:9px 7px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--c-border);text-align:left;}
+  .th-t{width:52px;background:var(--c-bg);color:var(--c-muted);}
+  .th-1{background:var(--c-s1h);color:var(--c-s1t);}
+  .th-2{background:var(--c-s2h);color:var(--c-s2t);}
+  .th-b{background:var(--c-brh);color:var(--c-brt);}
+  .day-table td{padding:3px 5px;border-bottom:1px solid var(--c-border);vertical-align:middle;}
+  .day-table tr:last-child td{border-bottom:none;}
+  .td-t{font-family:var(--mono);font-size:11px;color:var(--c-muted);padding-left:10px;white-space:nowrap;}
+  .td-q{font-family:var(--mono);font-size:12px;color:var(--c-muted);text-align:center;width:36px;}
+  .td-q.warn{color:#dc2626;font-weight:600;}
+  .row-full td{background:#fff8f8;}
+
+  .slot{min-height:30px;border-radius:5px;display:flex;align-items:center;padding:3px 7px;cursor:pointer;gap:5px;transition:opacity .1s;}
+  .slot:hover{opacity:.82;}
+  .slot.empty{color:#ccc;font-size:18px;font-weight:300;}
+  .slot.empty:hover{background:var(--c-bg);color:#aaa;}
+  .slot.s1{background:var(--c-s1);color:var(--c-s1t);border:1px solid var(--c-s1b);}
+  .slot.s2{background:var(--c-s2);color:var(--c-s2t);border:1px solid var(--c-s2b);}
+  .slot.sbr{background:var(--c-br);color:var(--c-brt);border:1px solid var(--c-brb);}
+  .slot.an{background:var(--c-an);color:var(--c-ant);border:1px solid var(--c-anb);}
+  .slot.an-linked{background:var(--c-an);color:var(--c-ant);border:1px dashed var(--c-anb);opacity:.7;cursor:pointer;}
+  .sn{font-weight:600;font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sb{font-size:10px;background:rgba(0,0,0,.08);border-radius:10px;padding:1px 5px;white-space:nowrap;flex-shrink:0;}
+
+  .week-wrap{background:var(--c-surface);border-radius:var(--r);border:1px solid var(--c-border);overflow-x:auto;}
+  .week-grid{display:grid;min-width:560px;}
+  .wth{padding:8px 5px;text-align:center;font-size:11px;font-weight:600;border-bottom:1px solid var(--c-border);border-right:1px solid var(--c-border);background:var(--c-bg);}
+  .wth.tc{background:#fef9c3;}.wth.cc{background:#fef2f2;color:#fca5a5;}.wth.sc2{background:var(--c-special);color:var(--c-specialt);}
+  .wtc{font-family:var(--mono);font-size:10px;color:var(--c-muted);padding:2px 5px;border-bottom:1px solid var(--c-border);border-right:1px solid var(--c-border);background:var(--c-bg);text-align:right;display:flex;align-items:center;justify-content:flex-end;}
+  .wdc{padding:2px 3px;border-bottom:1px solid var(--c-border);border-right:1px solid var(--c-border);min-height:26px;cursor:pointer;display:flex;flex-direction:column;gap:1px;}
+  .wdc:hover{background:rgba(0,0,0,.02);}
+  .wdc.tc{background:#fffef5;}.wdc.cc{background:#fef2f2;cursor:default;}.wdc.oh{background:#fafaf8;cursor:default;}
+  .wchip{font-size:10px;border-radius:3px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+  .wchip.s1{background:var(--c-s1);color:var(--c-s1t);}
+  .wchip.s2{background:var(--c-s2);color:var(--c-s2t);}
+  .wchip.sbr{background:var(--c-br);color:var(--c-brt);}
+  .wchip.an{background:var(--c-an);color:var(--c-ant);}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;z-index:200;padding:16px;overflow-y:auto;}
+  .modal{background:var(--c-surface);border-radius:12px;border:1px solid var(--c-border);padding:1.25rem;width:100%;max-width:460px;margin:auto;animation:mi .15s ease;}
+  @keyframes mi{from{transform:scale(.96);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .mh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;}
+  .mt{font-size:15px;font-weight:600;}.ms{font-size:12px;color:var(--c-muted);margin-top:2px;}
+  .mc{background:none;border:none;cursor:pointer;color:var(--c-muted);font-size:18px;line-height:1;padding:0 2px;}
+
+  .type-toggle{display:flex;gap:6px;margin-bottom:1rem;}
+  .tbtn{flex:1;padding:7px 6px;border:1px solid var(--c-border);border-radius:var(--r);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;background:var(--c-bg);color:var(--c-muted);text-align:center;}
+  .tbtn.an{background:var(--c-an);color:var(--c-ant);border-color:var(--c-anb);}
+  .tbtn.std{background:var(--c-s1);color:var(--c-s1t);border-color:var(--c-s1b);}
+
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--c-muted);margin-bottom:4px;}
+  .field input,.field select,.field textarea{width:100%;padding:7px 10px;border:1px solid var(--c-border);border-radius:var(--r);font-size:13px;font-family:var(--font);background:var(--c-bg);color:var(--c-text);outline:none;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--c-text);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .fr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .stitle{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--c-muted);padding:8px 0 5px;border-top:1px solid var(--c-border);margin-bottom:6px;margin-top:4px;}
+  .gateau-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
+  .gbtn{padding:6px 8px;border:1px solid var(--c-border);border-radius:6px;font-size:12px;font-family:var(--font);background:var(--c-bg);cursor:pointer;text-align:left;color:var(--c-text);line-height:1.3;}
+  .gbtn:hover{border-color:var(--c-anb);}
+  .gbtn.sel{background:var(--c-an);border-color:var(--c-anb);color:var(--c-ant);font-weight:500;}
+  .gbtn.unavail{opacity:.35;cursor:not-allowed;}
+  .gateau-note{font-size:11px;color:var(--c-muted);margin-top:5px;font-style:italic;}
+  .check-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
+  .check-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--c-text);}
+  .check-row label{font-size:13px;cursor:pointer;}
+  .formule-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
+  .fbtn{padding:7px 8px;border:1px solid var(--c-border);border-radius:6px;font-size:11px;font-family:var(--font);background:var(--c-bg);cursor:pointer;text-align:left;color:var(--c-text);line-height:1.4;}
+  .fbtn:hover{border-color:var(--c-text);}
+  .fbtn.sel{background:var(--c-text);color:#fff;border-color:var(--c-text);}
+  .fbtn .prix{font-weight:600;font-size:12px;display:block;margin-top:2px;}
+  .anniv-preview{background:var(--c-an);border:1px solid var(--c-anb);border-radius:var(--r);padding:10px 12px;margin-top:8px;font-size:12px;color:var(--c-ant);line-height:1.7;}
+  .anniv-preview strong{font-weight:600;}
+
+  .modal-actions{display:flex;gap:7px;margin-top:1rem;}
+  .btn{flex:1;padding:9px 10px;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--c-border);}
+  .btn-x{background:var(--c-bg);color:var(--c-text);}.btn-x:hover{background:var(--c-border);}
+  .btn-s{background:var(--c-text);color:#fff;border-color:var(--c-text);}.btn-s:hover{opacity:.85;}
+  .btn-d{background:#fee2e2;color:#991b1b;border-color:#fca5a5;flex:.6;}.btn-d:hover{background:#fca5a5;}
+
+  /* CALENDRIER */
+  .cal-modal{max-width:560px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0;}
+  .cal-day-header{text-align:center;font-size:11px;font-weight:600;color:var(--c-muted);padding:4px 0;}
+  .cal-day{border:1px solid var(--c-border);border-radius:6px;padding:5px 4px;text-align:center;cursor:pointer;font-size:12px;min-height:42px;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--c-surface);}
+  .cal-day:hover{border-color:var(--c-text);}
+  .cal-day.empty{background:transparent;border-color:transparent;cursor:default;}
+  .cal-day.closed{background:#fef2f2;color:#fca5a5;}
+  .cal-day.today{border-color:var(--c-text);font-weight:600;}
+  .cal-day.has-ex{background:var(--c-special);border-color:var(--c-specialb);color:var(--c-specialt);}
+  .cal-day.has-ex.closed-ex{background:#fef2f2;border-color:#fca5a5;}
+  .cal-dot{width:6px;height:6px;border-radius:50%;background:var(--c-specialb);}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .cal-nav-btn{background:none;border:1px solid var(--c-border);border-radius:var(--r);padding:5px 12px;cursor:pointer;font-family:var(--font);font-size:13px;}
+  .cal-nav-btn:hover{background:var(--c-bg);}
+  .cal-month-title{font-weight:600;font-size:14px;}
+  .ex-modal{max-width:380px;}
+  .ferm-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--r);background:var(--c-bg);margin-bottom:12px;cursor:pointer;}
+  .ferm-toggle input[type=checkbox]{width:18px;height:18px;accent-color:#dc2626;cursor:pointer;}
+  .ex-list{margin-top:10px;}
+  .ex-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--c-border);border-radius:var(--r);margin-bottom:6px;background:var(--c-surface);}
+  .ex-item.closed-ex{border-color:#fca5a5;background:#fef2f2;}
+  .ex-item.open-ex{border-color:var(--c-specialb);background:var(--c-special);}
+  .ex-date{font-weight:600;font-size:12px;min-width:90px;}
+  .ex-info{flex:1;font-size:12px;color:var(--c-muted);}
+  .ex-del{background:none;border:none;cursor:pointer;color:#dc2626;font-size:16px;padding:0 4px;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--c-text);color:#fff;padding:10px 20px;border-radius:var(--r);font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .alert-banner{background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--r);padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:8px;}
+
+  /* STATS */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem;}
+  .stat-card{background:var(--c-bg);border-radius:var(--r);padding:12px 14px;text-align:center;}
+  .stat-card .val{font-size:28px;font-weight:600;line-height:1.1;color:var(--c-text);}
+  .stat-card .lbl{font-size:11px;color:var(--c-muted);margin-top:4px;text-transform:uppercase;letter-spacing:.4px;}
+  .stats-section{margin-bottom:1.25rem;}
+  .stats-section h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--c-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--c-border);}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:13px;}
+  .bar-label{min-width:160px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-track{flex:1;background:var(--c-border);border-radius:4px;height:10px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--c-text);transition:width .3s;}
+  .bar-val{min-width:36px;text-align:right;font-size:12px;color:var(--c-muted);font-family:var(--mono);}
+  .anniv-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .anniv-table th{text-align:left;padding:6px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--c-muted);border-bottom:1px solid var(--c-border);}
+  .anniv-table td{padding:7px 8px;border-bottom:1px solid var(--c-border);vertical-align:top;}
+  .anniv-table tr:last-child td{border-bottom:none;}
+  .anniv-table tr.past td{opacity:.45;}
+  .badge-an{background:var(--c-an);color:var(--c-ant);border-radius:4px;padding:2px 6px;font-size:11px;font-weight:500;}
+  .badge-gateau{background:#fce7f3;color:#831843;border-radius:4px;padding:2px 6px;font-size:11px;}
+  .fill-bar{height:8px;border-radius:4px;background:var(--c-s1);margin-top:3px;}
+  .fill-bar.s2{background:var(--c-s2);}
+  .fill-bar.sbr{background:var(--c-br);}
+
+  @media print {
+    body{background:#fff;font-size:11px;}
+    .topbar,.legend,.stats-bar,.no-print,.special-badge{display:none!important;}
+    .main{padding:0;max-width:100%;}
+    .day-table{border:1px solid #999;border-radius:0;}
+    .day-table th,.day-table td{border-color:#999;}
+    .th-1{background:#fff8cc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .th-2{background:#dbeafe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .th-b{background:#dcfce7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.s1,.slot.an{background:#fff8cc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.s2{background:#dbeafe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.sbr,.slot.an-linked{background:#dcfce7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.empty{display:none;}
+    .print-header{display:block!important;}
+  }
+  .print-header{display:none;text-align:center;padding:10px 0 16px;font-size:16px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Fun <span>Laser</span> — Planning</div>
+  <button class="abtn" onclick="goToday()">Aujourd'hui</button>
+  <div class="date-nav">
+    <button class="nav-btn" onclick="navigate(-1)">&#8592;</button>
+    <div class="date-label" id="date-label" onclick="openDatePicker()" title="Cliquer pour aller à une date" style="cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.4)">—</div>
+  <input type="date" id="date-picker" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" onchange="goToDate(this.value)"/>
+    <button class="nav-btn" onclick="navigate(1)">&#8594;</button>
+  </div>
+  <div class="view-toggle">
+    <button class="vbtn active" id="btn-day" onclick="setView('day')">Jour</button>
+    <button class="vbtn" id="btn-week" onclick="setView('week')">Semaine</button>
+  </div>
+  <span id="sync-status" style="font-size:11px;color:rgba(255,255,255,.6)">⟳ Connexion…</span>
+  <button class="abtn" onclick="refreshFromSheets()" title="Actualiser depuis Google Sheets" style="padding:5px 8px">🔄</button>
+  <div class="tbg">
+    <button class="abtn special" onclick="openCalModal()">📅 Calendrier</button>
+    <button class="abtn" onclick="openStats()" style="border-color:#34d399;color:#6ee7b7">📊 Stats</button>
+    <button class="abtn" id="btn-print" onclick="printDay()">🖨️ Imprimer</button>
+    <button class="abtn" onclick="exportData()">💾 Exporter</button>
+    <button class="abtn" onclick="document.getElementById('imp').click()">📂 Importer</button>
+    <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)"/>
+  </div>
+</div>
+
+<div class="main">
+  <div class="print-header" id="print-header"></div>
+  <div class="legend no-print">
+    <div class="li"><div class="ld" style="background:var(--c-s1);border:1px solid var(--c-s1b)"></div>Salle I</div>
+    <div class="li"><div class="ld" style="background:var(--c-s2);border:1px solid var(--c-s2b)"></div>Salle II</div>
+    <div class="li"><div class="ld" style="background:var(--c-br);border:1px solid var(--c-brb)"></div>Salle Privée</div>
+    <div class="li"><div class="ld" style="background:var(--c-an);border:1px solid var(--c-anb)"></div>Anniversaire</div>
+    <div class="li"><div class="ld" style="background:var(--c-special);border:1px solid var(--c-specialb)"></div>Jour spécial</div>
+  </div>
+  <div id="alert-zone"></div>
+  <div class="stats-bar" id="stats-bar"></div>
+  <div id="view-day"></div>
+  <div id="view-week" style="display:none"></div>
+</div>
+
+<!-- MODAL RÉSERVATION -->
+<div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+<div class="modal">
+  <div class="mh">
+    <div><div class="mt" id="modal-title">Réservation</div><div class="ms" id="modal-sub"></div></div>
+    <button class="mc" onclick="closeModal()">✕</button>
+  </div>
+  <div id="other-salle-warning" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--r);padding:9px 12px;margin-bottom:12px;font-size:12px;color:#92400e;"></div>
+  <div class="type-toggle">
+    <button class="tbtn std" id="type-std" onclick="setType('std')">Réservation standard</button>
+    <button class="tbtn" id="type-an" onclick="setType('an')">🎂 Anniversaire</button>
+  </div>
+  <div class="fr">
+    <div class="field"><label>Nom</label><input type="text" id="f-nom" placeholder="NOM" autocomplete="off"/></div>
+    <div class="field"><label>Prénom</label><input type="text" id="f-prenom" placeholder="Prénom"/></div>
+  </div>
+  <div class="fr">
+    <div class="field"><label>Téléphone</label><input type="tel" id="f-phone" placeholder="079 …"/></div>
+    <div class="field"><label>Email</label><input type="email" id="f-email" placeholder="email@…"/></div>
+  </div>
+  <div class="fr">
+    <div class="field"><label>Nb de personnes</label><input type="number" id="f-count" min="1" max="25" placeholder="max 25"/></div>
+    <div class="field" id="salle-field"><label>Salle</label>
+      <select id="f-salle"><option value="s1">Salle I</option><option value="s2">Salle II</option><option value="sbr">Salle Privée</option></select>
+    </div>
+  </div>
+  <div id="std-fields">
+    <div class="field"><label>Entreprise (si applicable)</label><input type="text" id="f-entreprise" placeholder="Nom de l'entreprise"/></div>
+    <div class="stitle">Formule</div>
+    <div class="formule-grid" id="formule-grid"></div>
+    <input type="text" id="f-formule-txt" style="display:none;margin-top:6px;width:100%;padding:7px 10px;border:1px solid var(--c-border);border-radius:var(--r);font-size:13px;font-family:var(--font);background:var(--c-bg);color:var(--c-text);" placeholder="Préciser la formule…"/>
+    <div style="margin-top:10px">
+      <div class="check-row"><input type="checkbox" id="f-ok-partenaire"/><label for="f-ok-partenaire">✅ OK avec le partenaire</label></div>
+      <div class="check-row"><input type="checkbox" id="f-nb-valide"/><label for="f-nb-valide">✅ Nombre de personnes validé</label></div>
+    </div>
+    <div id="aperitive-preview" class="anniv-preview" style="display:none;margin-top:8px"></div>
+    <div class="field" style="margin-top:8px"><label>Notes</label><textarea id="f-notes-std" placeholder="Remarques…"></textarea></div>
+  </div>
+  <div id="an-fields" style="display:none">
+    <div class="stitle">Enfant qui fête</div>
+    <div class="fr">
+      <div class="field"><label>Prénom de l'enfant</label><input type="text" id="f-child" placeholder="Prénom"/></div>
+      <div class="field"><label>Âge fêté</label><input type="number" id="f-age" min="1" max="18" placeholder="ex: 9"/></div>
+    </div>
+    <div class="field"><label>Date de naissance</label><input type="date" id="f-dob"/></div>
+    <div class="stitle">Adresse postale des parents</div>
+    <div class="field"><input type="text" id="f-address" placeholder="Rue et numéro"/></div>
+    <div class="fr">
+      <div class="field"><input type="text" id="f-npa" placeholder="NPA"/></div>
+      <div class="field"><input type="text" id="f-ville" placeholder="Ville"/></div>
+    </div>
+    <div class="stitle">Formule anniversaire</div>
+    <div class="formule-grid" id="formule-an-grid"></div>
+    <div id="gateau-section" style="display:none;margin-top:10px">
+      <div class="stitle" style="border-top:none;padding-top:0">Choix du gâteau</div>
+      <div class="gateau-grid" id="gateau-grid"></div>
+      <div class="gateau-note" id="gateau-note"></div>
+      <input type="text" id="f-gateau-custom" placeholder="Préciser…" style="display:none;margin-top:6px;width:100%;padding:7px 10px;border:1px solid var(--c-border);border-radius:var(--r);font-size:13px;font-family:var(--font);background:var(--c-bg);color:var(--c-text);"/>
+    </div>
+    <!-- Aperçu des créneaux réservés automatiquement -->
+    <div id="anniv-preview" class="anniv-preview" style="display:none"></div>
+    <div id="gateau-commande-row" style="display:none;margin-top:6px">
+      <div class="check-row"><input type="checkbox" id="f-gateau-commande"/><label for="f-gateau-commande">🎂 Gâteau commandé</label></div>
+    </div>
+    <div class="field" style="margin-top:8px"><label>Divers / allergies / notes</label><textarea id="f-notes-an" placeholder="Allergies, demandes spéciales…"></textarea></div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-x" onclick="closeModal()">Annuler</button>
+    <button class="btn btn-d" id="btn-del" onclick="deleteResa()" style="display:none">Supprimer</button>
+    <button class="btn btn-s" onclick="saveResa()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL CALENDRIER -->
+<div class="modal-bg" id="modal-cal" style="display:none" onclick="if(event.target===this)closeCalModal()">
+<div class="modal cal-modal">
+  <div class="mh">
+    <div><div class="mt">📅 Calendrier — Jours spéciaux</div><div class="ms">Cliquez sur un jour pour ajouter une exception</div></div>
+    <button class="mc" onclick="closeCalModal()">✕</button>
+  </div>
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calNav(-1)">&#8592;</button>
+    <div class="cal-month-title" id="cal-month-title"></div>
+    <button class="cal-nav-btn" onclick="calNav(1)">&#8594;</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div class="stitle" style="margin-top:4px">Exceptions enregistrées</div>
+  <div class="ex-list" id="ex-list"></div>
+  <div class="modal-actions"><button class="btn btn-x" onclick="closeCalModal()">Fermer</button></div>
+</div>
+</div>
+
+<!-- MODAL EXCEPTION -->
+<div class="modal-bg" id="modal-ex" style="display:none" onclick="if(event.target===this)closeExModal()">
+<div class="modal ex-modal">
+  <div class="mh">
+    <div><div class="mt">Jour spécial</div><div class="ms" id="ex-sub"></div></div>
+    <button class="mc" onclick="closeExModal()">✕</button>
+  </div>
+  <label class="ferm-toggle">
+    <input type="checkbox" id="ex-closed" onchange="toggleExClosed()"/>
+    <span style="font-size:13px;font-weight:500;pointer-events:none">🔒 Fermer exceptionnellement ce jour</span>
+  </label>
+  <div id="ex-hours">
+    <div class="fr">
+      <div class="field"><label>Ouverture</label><input type="time" id="ex-start" value="10:00"/></div>
+      <div class="field"><label>Fermeture</label><input type="time" id="ex-end" value="18:00"/></div>
+    </div>
+  </div>
+  <div class="field"><label>Note / Motif</label><input type="text" id="ex-note" placeholder="ex: Ouverture spéciale, Événement privé…"/></div>
+  <div class="modal-actions">
+    <button class="btn btn-x" onclick="closeExModal()">Annuler</button>
+    <button class="btn btn-d" id="ex-btn-del" onclick="deleteException()" style="display:none">Supprimer</button>
+    <button class="btn btn-s" onclick="saveException()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL STATS -->
+<div class="modal-bg" id="modal-stats" style="display:none" onclick="if(event.target===this)closeStats()">
+<div class="modal" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+  <div class="mh">
+    <div><div class="mt">📊 Statistiques</div><div class="ms" id="stats-period-label"></div></div>
+    <button class="mc" onclick="closeStats()">✕</button>
+  </div>
+
+  <!-- Sélecteur période -->
+  <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;">
+    <button class="fbtn" id="sp-week" onclick="setStatPeriod('week')">Cette semaine</button>
+    <button class="fbtn" id="sp-month" onclick="setStatPeriod('month')">Ce mois</button>
+    <button class="fbtn" id="sp-year" onclick="setStatPeriod('year')">Cette année</button>
+    <button class="fbtn" id="sp-all" onclick="setStatPeriod('all')">Tout</button>
+    <button class="fbtn no-print" onclick="window.print()" style="margin-left:auto">🖨️ Imprimer</button>
+  </div>
+
+  <div id="stats-content"></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCHEDULE={
+  0:{open:true,start:'14:00',end:'20:00'},
+  1:{open:false},
+  2:{open:true,start:'16:00',end:'22:00'},
+  3:{open:true,start:'14:00',end:'22:00'},
+  4:{open:true,start:'16:00',end:'23:00'},
+  5:{open:true,start:'16:00',end:'23:00'},
+  6:{open:true,start:'14:00',end:'24:30'},
+};
+const FORMULES_STD=[
+  {id:'laser1',label:'1 partie laser',prix:'',aperitive:false,parties:1,privateSalle:false},
+  {id:'laser2',label:'2 parties laser',prix:'',aperitive:false,parties:2,privateSalle:false},
+  {id:'ap27',label:'Apéritive — Boissons & snacks',prix:'CHF 27.–/pers (min 8)',aperitive:true,parties:1,privateSalle:true,
+    detail:'1 partie · Salle Privée 1h · Boissons sans alcool, chips, crackers, feuilletés, cacahuètes'},
+  {id:'ap37',label:'Apéritive — + Tarterie Littoral',prix:'CHF 37.–/pers (min 8)',aperitive:true,parties:1,privateSalle:true,
+    detail:'1 partie · Salle Privée 1h · Formule CHF 27 + pains surprises, petits sandwichs, feuilletés (Tarterie du Littoral)'},
+  {id:'ap47',label:'Apéritive — + Verrines & canapés',prix:'CHF 47.–/pers (min 8)',aperitive:true,parties:1,privateSalle:true,
+    detail:'1 partie · Salle Privée 1h · Formule CHF 37 + verrines et mini canapés'},
+  {id:'vins',label:'Dégustation vins (M. Engel)',prix:'CHF 32.–/pers',aperitive:false,parties:0,privateSalle:false},
+  {id:'bieres',label:'Dégustation bières (Celestial)',prix:'CHF 32.–/pers',aperitive:false,parties:0,privateSalle:false},
+  {id:'carnivore-lobby',label:'Carnivore – Lobby',prix:'CHF 50.–/pers',aperitive:false,parties:0,privateSalle:false},
+  {id:'carnivore-piscine',label:'Carnivore – Piscine',prix:'CHF 50.–/pers',aperitive:false,parties:0,privateSalle:false},
+  {id:'fondue-fromage',label:'Fondue fromage – Lobby',prix:'CHF 36.–/pers',aperitive:false,parties:0,privateSalle:false},
+  {id:'autre',label:'Autre…',prix:'',aperitive:false,parties:0,privateSalle:false},
+];
+const FORMULES_AN=[
+  {id:'a1s',label:'1 partie + bol bonbons',prix:'CHF 25.–/pers',gateau:false,parties:1},
+  {id:'a2s',label:'2 parties + bol bonbons',prix:'CHF 35.–/pers',gateau:false,parties:2},
+  {id:'a1g',label:'1 partie + gâteau',prix:'CHF 30.–/pers',gateau:true,parties:1},
+  {id:'a2g',label:'2 parties + gâteau',prix:'CHF 40.–/pers (min 10)',gateau:true,parties:2},
+];
+const GATEAUX=[
+  {id:'creme',label:'Gâteau à la crème',avail:'all'},
+  {id:'noisettes',label:'Gâteau aux noisettes',avail:'all'},
+  {id:'chocolat',label:'Gâteau au chocolat',avail:'all'},
+  {id:'foret-noire-c',label:'Forêt-noire avec cerises',avail:'all'},
+  {id:'foret-noire-sc',label:'Forêt-noire sans cerises',avail:'all'},
+  {id:'foret-blanche-f',label:'Forêt-blanche framboises',avail:'all'},
+  {id:'foret-blanche-c',label:'Forêt-blanche cerises',avail:'all'},
+  {id:'mille-feuilles',label:'Mille-feuilles',avail:'noSun'},
+  {id:'tourte-fruits',label:'Tourte aux fruits / fraise',avail:'noSun'},
+  {id:'mousse-framboises',label:'Mousse framboises',avail:'noSun'},
+  {id:'mousse-passion',label:'Mousse fruits de la passion',avail:'noSun'},
+  {id:'autre',label:'Autre…',avail:'all'},
+];
+
+const MAX_PLAYERS=25;
+const MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const DAYS_FULL=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const DAYS_SHORT=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const SALLE_LABELS={s1:'Salle I',s2:'Salle II',sbr:'Salle Privée'};
+
+let currentDate=new Date();currentDate.setHours(0,0,0,0);
+let view='day';
+let resas=JSON.parse(localStorage.getItem('fl_v6')||'{}');
+let exceptions=JSON.parse(localStorage.getItem('fl_ex')||'{}');
+let editKey=null,newCtx=null,selGateau='',selFormule='',selFormuleAn='',resaType='std';
+let calViewDate=new Date(),exEditKey=null;
+
+function save(){localStorage.setItem('fl_v6',JSON.stringify(resas));}
+function saveEx(){localStorage.setItem('fl_ex',JSON.stringify(exceptions));}
+function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function isToday(d){const t=new Date();t.setHours(0,0,0,0);return d.getTime()===t.getTime();}
+function getResa(dk,slot,salle){return resas[dk+'|'+slot+'|'+salle]||null;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Convertit "HH:MM" en minutes
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+// Convertit minutes en "HH:MM"
+function fromMin(m){const h=Math.floor(m/60);const mm=m%60;return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0');}
+// Ajoute n*30 minutes à un slot
+function addSlots(slot,n){return fromMin(toMin(slot)+n*30);}
+// Affichage: 24:xx -> 00:xx
+function ds(slot){return slot.startsWith('24')?slot.replace(/^24/,'00'):slot;}
+
+function getEffectiveSchedule(dk,dow){
+  const ex=exceptions[dk];
+  if(ex) return ex.closed?{open:false,note:ex.note||'',isEx:true}:{open:true,start:ex.start,end:ex.end,note:ex.note||'',isEx:true};
+  const s=SCHEDULE[dow];
+  return s.open?{open:true,start:s.start,end:s.end,note:'',isEx:false}:{open:false,note:'',isEx:false};
+}
+function getSlotsForSchedule(sched){
+  if(!sched.open)return[];
+  const slots=[];let cur=toMin(sched.start);const endM=toMin(sched.end);
+  while(cur<endM){slots.push(fromMin(cur));cur+=30;}
+  return slots;
+}
+
+// Calcule les créneaux occupés par un anniversaire
+// Retourne { s1:[slots], s2:[slots], sbr:[slots] }
+function getAnnivSlots(startSlot, parties){
+  const s1=[startSlot];
+  const s2=parties===2?[addSlots(startSlot,1)]:[];
+  // Salle privée: du début jusqu'à 1h après la fin du jeu
+  // 1 partie: jeu=1 slot(30min), privée pendant 3 slots (1h30 total)
+  // 2 parties: jeu=2 slots(1h), privée pendant 4 slots (2h total)
+  const sbrCount=parties===1?3:4;
+  const sbr=[];
+  for(let i=0;i<sbrCount;i++)sbr.push(addSlots(startSlot,i));
+  return{s1,s2,sbr};
+}
+
+// Compte les joueurs sur un créneau (s1+s2 seulement)
+function countPlayers(dk,slot){
+  let total=0;
+  const r1=getResa(dk,slot,'s1');const r2=getResa(dk,slot,'s2');
+  if(r1)total+=(r1.count||0);
+  if(r2)total+=(r2.count||0);
+  return total;
+}
+
+function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+
+// EXPORT / IMPORT
+function exportData(){
+  const nb=Object.keys(resas).length;
+  const blob=new Blob([JSON.stringify({exportDate:new Date().toISOString(),version:'fl_v6',reservations:resas,exceptions},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`fun_laser_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  URL.revokeObjectURL(url);toast(`✅ ${nb} réservation${nb>1?'s':''} exportée${nb>1?'s':''} !`);
+}
+function importData(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const imported=data.reservations||data;
+      const nb=Object.keys(imported).length;
+      if(!confirm(`Importer ${nb} réservation${nb>1?'s':''}?\n⚠️ Remplace toutes les données actuelles.`)){event.target.value='';return;}
+      resas=imported;save();
+      if(data.exceptions){exceptions=data.exceptions;saveEx();}
+      render();
+      syncAll();
+      toast(`✅ ${nb} réservation${nb>1?'s':''} importée${nb>1?'s':''} !`);
+    }catch(err){alert('❌ Fichier invalide.\n'+err.message);}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function printDay(){
+  const dk=dateKey(currentDate),dow=currentDate.getDay();
+  document.getElementById('print-header').textContent='Fun Laser de St-Blaise — Planning du '+DAYS_FULL[dow]+' '+currentDate.getDate()+' '+MONTHS[currentDate.getMonth()]+' '+currentDate.getFullYear();
+  window.print();
+}
+
+function goToday(){currentDate=new Date();currentDate.setHours(0,0,0,0);render();}
+
+function openDatePicker(){
+  const picker=document.getElementById('date-picker');
+  picker.value=dateKey(currentDate);
+  picker.style.pointerEvents='auto';
+  picker.showPicker?picker.showPicker():picker.click();
+  picker.addEventListener('blur',()=>{picker.style.pointerEvents='none';},{once:true});
+}
+function goToDate(val){
+  if(!val)return;
+  const p=val.split('-');
+  currentDate=new Date(+p[0],+p[1]-1,+p[2]);
+  currentDate.setHours(0,0,0,0);
+  document.getElementById('date-picker').style.pointerEvents='none';
+  if(view==='week'){
+    // En vue semaine, rester en vue semaine sur la semaine de la date choisie
+  }
+  render();
+}
+function navigate(n){
+  if(view==='day')currentDate.setDate(currentDate.getDate()+n);
+  else currentDate.setDate(currentDate.getDate()+n*7);
+  render();
+}
+function setView(v){
+  view=v;
+  document.getElementById('btn-day').className='vbtn'+(v==='day'?' active':'');
+  document.getElementById('btn-week').className='vbtn'+(v==='week'?' active':'');
+  document.getElementById('view-day').style.display=v==='day'?'':'none';
+  document.getElementById('view-week').style.display=v==='week'?'':'none';
+  document.getElementById('btn-print').style.display=v==='day'?'':'none';
+  render();
+}
+function render(){if(view==='day')renderDay();else renderWeek();}
+
+// DAY VIEW
+function renderDay(){
+  const dk=dateKey(currentDate),dow=currentDate.getDay(),sched=getEffectiveSchedule(dk,dow);
+  document.getElementById('date-label').textContent=DAYS_FULL[dow]+' '+currentDate.getDate()+' '+MONTHS[currentDate.getMonth()]+' '+currentDate.getFullYear();
+  document.getElementById('alert-zone').innerHTML='';
+  if(!sched.open){
+    document.getElementById('stats-bar').innerHTML='';
+    const msg=sched.note?`🔒 Fermé — ${sched.note}`:'🔒 Fermé ce jour';
+    document.getElementById('view-day').innerHTML=`<div class="closed-banner ${sched.isEx?'spec':'ferm'}">${esc(msg)}</div>`;
+    return;
+  }
+  const slots=getSlotsForSchedule(sched);
+  let rCount=0,total=0;
+  slots.forEach(s=>['s1','s2','sbr'].forEach(sa=>{const r=getResa(dk,s,sa);if(r&&!r.linkedTo){rCount++;total+=(r.count||0);}}));
+  const endD=sched.end==='24:30'?'00h30':sched.end.replace(':','h');
+  const exBadge=sched.isEx?`<span class="special-badge no-print" onclick="openExModalForDate('${dk}')">✨ Jour spécial${sched.note?' · '+esc(sched.note):''} · modifier</span>`:'';
+  document.getElementById('stats-bar').innerHTML=`${exBadge}<div class="sc no-print"><strong>${rCount}</strong> résa${rCount>1?'s':''}</div><div class="sc no-print"><strong>${total}</strong> joueur${total>1?'s':''}</div><div class="sc no-print" style="color:var(--c-muted)">${sched.start.replace(':','h')}–${endD}</div>`;
+
+  let html=`<table class="day-table" style="table-layout:fixed;width:100%">
+    <colgroup><col style="width:52px"><col><col style="width:38px"><col><col style="width:38px"><col><col style="width:38px"></colgroup>
+    <thead><tr><th class="th-t"></th><th class="th-1" colspan="2">Salle I</th><th class="th-2" colspan="2">Salle II</th><th class="th-b" colspan="2">Salle Privée</th></tr></thead><tbody>`;
+
+  slots.forEach(slot=>{
+    const r1=getResa(dk,slot,'s1'),r2=getResa(dk,slot,'s2'),rb=getResa(dk,slot,'sbr');
+    const players=countPlayers(dk,slot);
+    const full=players>=MAX_PLAYERS;
+    const warnQ=players>0&&players<MAX_PLAYERS;
+    const rowCls=full?' class="row-full"':'';
+    html+=`<tr${rowCls}><td class="td-t">${ds(slot)}</td>
+      <td>${slotHtml(dk,slot,'s1',r1)}</td>
+      <td class="td-q${full?' warn':''}">${players>0?players:''}</td>
+      <td>${slotHtml(dk,slot,'s2',r2)}</td>
+      <td class="td-q"></td>
+      <td>${slotHtml(dk,slot,'sbr',rb)}</td>
+      <td class="td-q"></td></tr>`;
+  });
+  html+='</tbody></table>';
+  html+=`<div style="margin-top:10px;text-align:center" class="no-print"><button class="abtn special" onclick="openExModalForDate('${dk}')">${sched.isEx?'Modifier le jour spécial':'✨ Ajouter ouverture / fermeture spéciale'}</button></div>`;
+  document.getElementById('view-day').innerHTML=html;
+}
+
+function slotHtml(dk,slot,salle,r){
+  if(r){
+    const isLinked=!!r.linkedTo;
+    const cls=isLinked?'an-linked':(r.type==='an'?'an':salle);
+    const name=r.type==='an'||isLinked?esc(r.nom||'')+(r.child?' 🎂 '+esc(r.child):''):esc((r.nom||'')+(r.prenom?' '+r.prenom:''));
+    const gateauBadge=r.gateauCommande?'<span class="sb" style="background:rgba(236,72,153,.15);color:#831843">✅ gâteau</span>':'';
+    const badge=isLinked?`<span class="sb">${salle==='sbr'?'Privée liée':'Partie liée'}</span>`:(r.formule?`<span class="sb">${esc(r.formule.substring(0,18))}</span>${gateauBadge}`:gateauBadge);
+    // Utiliser data-key pour éviter les problèmes d'échappement dans onclick
+    const targetKey=isLinked?(r.linkedTo||dk+'|'+slot+'|'+salle):(dk+'|'+slot+'|'+salle);
+    return `<div class="slot ${cls}" data-key="${esc(targetKey)}" onclick="handleSlotClick(this)"><span class="sn">${name}</span>${badge}</div>`;
+  }
+  return `<div class="slot empty" data-dk="${esc(dk)}" data-slot="${esc(slot)}" data-salle="${salle}" onclick="handleEmptyClick(this)">+</div>`;
+}
+
+// WEEK VIEW
+function renderWeek(){
+  const start=new Date(currentDate);
+  const dow=start.getDay()===0?6:start.getDay()-1;
+  start.setDate(start.getDate()-dow);
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return d;});
+  document.getElementById('date-label').textContent=days[0].getDate()+' – '+days[6].getDate()+' '+MONTHS[days[6].getMonth()]+' '+days[6].getFullYear();
+  document.getElementById('stats-bar').innerHTML='';document.getElementById('alert-zone').innerHTML='';
+  const allSlotsSet=new Set();
+  days.forEach(d=>{const sched=getEffectiveSchedule(dateKey(d),d.getDay());getSlotsForSchedule(sched).forEach(s=>allSlotsSet.add(s));});
+  const allSlots=Array.from(allSlotsSet).sort();
+  let html=`<div class="week-wrap"><div class="week-grid" style="grid-template-columns:48px repeat(7,minmax(0,1fr))"><div class="wth"></div>`;
+  days.forEach(d=>{
+    const dk=dateKey(d),sched=getEffectiveSchedule(dk,d.getDay());
+    const cls=isToday(d)?' tc':!sched.open?' cc':sched.isEx?' sc2':'';
+    const tag=!sched.open?'<div style="font-size:9px;color:#fca5a5">FERMÉ</div>':sched.isEx?'<div style="font-size:9px;color:var(--c-specialt)">✨ SPÉCIAL</div>':'';
+    html+=`<div class="wth${cls}"><div>${DAYS_SHORT[d.getDay()]}</div><div style="font-size:11px;font-weight:400;color:var(--c-muted)">${d.getDate()}</div>${tag}</div>`;
+  });
+  allSlots.forEach(slot=>{
+    html+=`<div class="wtc">${ds(slot)}</div>`;
+    days.forEach(d=>{
+      const dk=dateKey(d),sched=getEffectiveSchedule(dk,d.getDay());
+      const inRange=getSlotsForSchedule(sched).includes(slot);
+      const cls=!sched.open?' cc':!inRange?' oh':isToday(d)?' tc':'';
+      html+=`<div class="wdc${cls}" ${sched.open&&inRange?`onclick="goDay('${dk}')"`:''}>`; 
+      if(inRange){['s1','s2','sbr'].forEach(sa=>{
+        const r=getResa(dk,slot,sa);
+        if(r&&!r.linkedTo){const cc=r.type==='an'?'an':sa;html+=`<div class="wchip ${cc}">${r.type==='an'?'🎂 '+esc((r.child||r.nom||'').split(' ')[0]):esc((r.nom||'').split(' ')[0])}</div>`;}
+        else if(r&&r.linkedTo){html+=`<div class="wchip an" style="opacity:.6;border:1px dashed">🎂…</div>`;}
+      });}
+      html+=`</div>`;
+    });
+  });
+  html+=`</div></div>`;
+  document.getElementById('view-week').innerHTML=html;
+}
+function goDay(dk){const p=dk.split('-');currentDate=new Date(+p[0],+p[1]-1,+p[2]);setView('day');}
+
+// ANNIVERSAIRE — calcul et aperçu
+function getAnFormule(){return FORMULES_AN.find(x=>x.id===selFormuleAn)||null;}
+
+function updateAnnivPreview(){
+  const prev=document.getElementById('anniv-preview');
+  if(!newCtx&&!editKey){prev.style.display='none';return;}
+  const f=getAnFormule();
+  if(!f){prev.style.display='none';return;}
+  const slot=newCtx?newCtx.slot:(editKey?editKey.split('|')[1]:null);
+  if(!slot){prev.style.display='none';return;}
+  const {s1,s2,sbr}=getAnnivSlots(slot,f.parties);
+  let html=`<strong>Créneaux réservés automatiquement :</strong><br>`;
+  html+=`Salle I : ${s1.map(ds).join(', ')}<br>`;
+  if(s2.length)html+=`Salle II : ${s2.map(ds).join(', ')}<br>`;
+  html+=`Salle Privée : ${sbr.map(ds).join(', ')}`;
+  prev.innerHTML=html;prev.style.display='';
+}
+
+// FORMULE GRIDS
+function buildFormuleGrid(cId,formules,selId,onSel){
+  const el=document.getElementById(cId);el.innerHTML='';
+  formules.forEach(f=>{
+    const btn=document.createElement('button');
+    btn.className='fbtn'+(selId===f.id?' sel':'');
+    btn.innerHTML=esc(f.label)+(f.prix?`<span class="prix">${esc(f.prix)}</span>`:'');
+    btn.onclick=()=>{onSel(f.id);buildFormuleGrid(cId,formules,f.id,onSel);};
+    el.appendChild(btn);
+  });
+}
+function buildGateauGrid(dow){
+  const isSun=dow===0,el=document.getElementById('gateau-grid');el.innerHTML='';
+  let hasU=false;
+  GATEAUX.forEach(g=>{
+    const unavail=isSun&&g.avail==='noSun';if(unavail)hasU=true;
+    const btn=document.createElement('button');
+    btn.className='gbtn'+(selGateau===g.id?' sel':'')+(unavail?' unavail':'');
+    btn.textContent=g.label;btn.disabled=unavail;
+    if(!unavail)btn.onclick=()=>{selGateau=g.id;buildGateauGrid(dow);
+      document.getElementById('f-gateau-custom').style.display=g.id==='autre'?'':'none';
+      if(g.id!=='autre')document.getElementById('f-gateau-custom').value='';
+    };
+    el.appendChild(btn);
+  });
+  document.getElementById('gateau-note').textContent=hasU?'* Certains gâteaux ne sont pas disponibles le dimanche.':'';
+}
+function checkGateauVisible(){
+  const f=getAnFormule();
+  const hasGateau=!!(f&&f.gateau);
+  document.getElementById('gateau-section').style.display=hasGateau?'':'none';
+  document.getElementById('gateau-commande-row').style.display=hasGateau?'':'none';
+  if(!hasGateau)document.getElementById('f-gateau-commande').checked=false;
+  updateAnnivPreview();
+}
+
+// TYPE
+function setType(t){
+  resaType=t;
+  document.getElementById('type-std').className='tbtn'+(t==='std'?' std':'');
+  document.getElementById('type-an').className='tbtn'+(t==='an'?' an':'');
+  document.getElementById('std-fields').style.display=t==='std'?'':'none';
+  document.getElementById('an-fields').style.display=t==='an'?'':'none';
+  document.getElementById('salle-field').style.display=t==='an'?'none':'';
+  if(t==='an')updateAnnivPreview();
+}
+
+// MODAL RÉSERVATION
+function openNew(dk,slot,salle){
+  editKey=null;newCtx={dk,slot,salle};
+  document.getElementById('modal-title').textContent='Nouvelle réservation';
+  document.getElementById('modal-sub').textContent=ds(slot)+' · '+SALLE_LABELS[salle];
+  clearModal();document.getElementById('f-salle').value=salle;
+  document.getElementById('btn-del').style.display='none';
+  // Avertissement si l'autre salle est occupée sur ce créneau
+  checkOtherSalleWarning(dk,slot,salle);
+  document.getElementById('modal').style.display='';
+  updateAperitivePreview();
+  setTimeout(()=>document.getElementById('f-nom').focus(),50);
+}
+function openEdit(k){
+  editKey=k;newCtx=null;
+  const r=resas[k],parts=k.split('|');
+  document.getElementById('modal-title').textContent='Modifier la réservation';
+  document.getElementById('modal-sub').textContent=ds(parts[1])+' · '+SALLE_LABELS[parts[2]];
+  clearModal();setType(r.type||'std');
+  ['nom','prenom','phone','email'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+  document.getElementById('f-count').value=r.count||'';
+  document.getElementById('f-salle').value=parts[2];
+  const dow=new Date(parts[0]+'T12:00:00').getDay();
+  if(r.type==='an'){
+    ['child','age','dob','address','npa','ville'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+    document.getElementById('f-notes-an').value=r.notes||'';
+    selFormuleAn=r.formuleId||'';
+    buildFormuleGrid('formule-an-grid',FORMULES_AN,selFormuleAn,id=>{selFormuleAn=id;checkGateauVisible();});
+    checkGateauVisible();selGateau=r.gateau||'';buildGateauGrid(dow);
+    if(r.gateau==='autre'){document.getElementById('f-gateau-custom').style.display='';document.getElementById('f-gateau-custom').value=r.gateauCustom||'';}
+    document.getElementById('f-gateau-commande').checked=r.gateauCommande||false;
+  }else{
+    document.getElementById('f-entreprise').value=r.entreprise||'';
+    document.getElementById('f-ok-partenaire').checked=r.okPartenaire||false;
+    document.getElementById('f-nb-valide').checked=r.nbValide||false;
+    document.getElementById('f-notes-std').value=r.notes||'';
+    selFormule=r.formuleId||'';
+    buildFormuleGrid('formule-grid',FORMULES_STD,selFormule,id=>{selFormule=id;document.getElementById('f-formule-txt').style.display=id==='autre'?'':'none';});
+    if(r.formuleId==='autre'){document.getElementById('f-formule-txt').style.display='';document.getElementById('f-formule-txt').value=r.formuleCustom||'';}
+  }
+  document.getElementById('btn-del').style.display='';
+  document.getElementById('modal').style.display='';
+  setTimeout(()=>document.getElementById('f-nom').focus(),50);
+}
+function clearModal(){
+  setType('std');
+  ['nom','prenom','phone','email','entreprise','child','age','dob','address','npa','ville'].forEach(f=>{const el=document.getElementById('f-'+f);if(el)el.value='';});
+  ['f-notes-std','f-notes-an','f-gateau-custom','f-formule-txt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-count').value='';
+  document.getElementById('f-ok-partenaire').checked=false;document.getElementById('f-nb-valide').checked=false;
+  selGateau='';selFormule='';selFormuleAn='';
+  const gcEl=document.getElementById('f-gateau-commande');if(gcEl)gcEl.checked=false;
+  const gcRow=document.getElementById('gateau-commande-row');if(gcRow)gcRow.style.display='none';
+  document.getElementById('gateau-section').style.display='none';
+  document.getElementById('f-gateau-custom').style.display='none';
+  document.getElementById('f-formule-txt').style.display='none';
+  document.getElementById('anniv-preview').style.display='none';
+  buildFormuleGrid('formule-grid',FORMULES_STD,'',id=>{selFormule=id;document.getElementById('f-formule-txt').style.display=id==='autre'?'':'none';updateAperitivePreview();});
+  buildFormuleGrid('formule-an-grid',FORMULES_AN,'',id=>{selFormuleAn=id;checkGateauVisible();});
+}
+function closeModal(){document.getElementById('modal').style.display='none';}
+
+function saveResa(){
+  const nom=document.getElementById('f-nom').value.trim();
+  if(!nom){document.getElementById('f-nom').focus();return;}
+  const prenom=document.getElementById('f-prenom').value.trim();
+  const count=parseInt(document.getElementById('f-count').value)||0;
+
+  // Vérification limite 25 joueurs (s1+s2 uniquement)
+  if(resaType==='std'&&count>0){
+    const salle=document.getElementById('f-salle').value;
+    const dk=newCtx?newCtx.dk:editKey.split('|')[0];
+    const slot=newCtx?newCtx.slot:editKey.split('|')[1];
+    if(salle==='s1'||salle==='s2'){
+      const otherSalle=salle==='s1'?'s2':'s1';
+      const otherR=getResa(dk,slot,otherSalle);
+      const otherCount=otherR?otherR.count||0:0;
+      const total=count+otherCount;
+      if(total>MAX_PLAYERS){
+        alert(`⚠️ Limite dépassée !\n\nSalle I + Salle II = ${total} personnes pour ce créneau.\nMaximum autorisé : ${MAX_PLAYERS} (nombre de gilets disponibles).\n\nRéduisez le nombre de personnes.`);
+        return;
+      }
+    }
+  }
+
+  let formuleLabel='',formuleId='';
+  if(resaType==='an'){
+    formuleId=selFormuleAn;const f=getAnFormule();formuleLabel=f?f.label:'';
+  }else{
+    formuleId=selFormule;
+    if(formuleId==='autre')formuleLabel=document.getElementById('f-formule-txt').value.trim()||'Autre';
+    else{const f=FORMULES_STD.find(x=>x.id===formuleId);formuleLabel=f?f.label:'';}
+  }
+
+  const baseData={nom:nom.toUpperCase(),prenom,count,type:resaType,
+    phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),
+    formuleId,formule:formuleLabel};
+
+  if(resaType==='an'){
+    ['child','age','dob','address','npa','ville'].forEach(f=>baseData[f]=document.getElementById('f-'+f).value.trim());
+    baseData.notes=document.getElementById('f-notes-an').value.trim();
+    baseData.gateau=selGateau;
+    baseData.gateauCustom=document.getElementById('f-gateau-custom').value.trim();
+    baseData.gateauCommande=document.getElementById('f-gateau-commande').checked;
+  }else{
+    baseData.entreprise=document.getElementById('f-entreprise').value.trim();
+    baseData.okPartenaire=document.getElementById('f-ok-partenaire').checked;
+    baseData.nbValide=document.getElementById('f-nb-valide').checked;
+    baseData.notes=document.getElementById('f-notes-std').value.trim();
+    baseData.formuleCustom=document.getElementById('f-formule-txt').value.trim();
+  }
+
+  // Si on édite, supprimer les anciens créneaux liés
+  if(editKey){
+    const oldR=resas[editKey];
+    if(oldR&&oldR.linkedKeys){oldR.linkedKeys.forEach(lk=>delete resas[lk]);}
+    delete resas[editKey];
+  }
+
+  const dk=newCtx?newCtx.dk:editKey?editKey.split('|')[0]:null;
+  const startSlot=newCtx?newCtx.slot:editKey?editKey.split('|')[1]:null;
+
+  // ── Écriture des réservations
+  if(resaType==='an'&&dk&&startSlot&&getAnFormule()){
+    // ANNIVERSAIRE: réservation multi-créneaux automatique
+    const f=getAnFormule();
+    const {s1,s2,sbr}=getAnnivSlots(startSlot,f.parties);
+    const mainKey=dk+'|'+s1[0]+'|s1';
+    const linkedKeys=[];
+    // Salle II si 2 parties
+    if(s2.length){
+      const k2=dk+'|'+s2[0]+'|s2';
+      resas[k2]={...baseData,linkedTo:mainKey,role:'Partie 2'};
+      linkedKeys.push(k2);
+    }
+    // Salle Privée (tous les créneaux)
+    sbr.forEach((sbrSlot,i)=>{
+      const kbr=dk+'|'+sbrSlot+'|sbr';
+      resas[kbr]={...baseData,linkedTo:mainKey,role:'Salle Privée'};
+      linkedKeys.push(kbr);
+    });
+    resas[mainKey]={...baseData,linkedKeys};
+
+  } else if(dk&&startSlot){
+    // STANDARD
+    const salle=document.getElementById('f-salle').value;
+    const fStd=FORMULES_STD.find(x=>x.id===selFormule);
+
+    if(fStd&&fStd.aperitive){
+      // Apéritive: Salle I créneau 1 + Salle Privée 3 créneaux
+      const mainKey=dk+'|'+startSlot+'|s1';
+      const linkedKeys=[];
+      for(let i=0;i<3;i++){
+        const kbr=dk+'|'+addSlots(startSlot,i)+'|sbr';
+        resas[kbr]={...baseData,linkedTo:mainKey,role:'Salle Privée'};
+        linkedKeys.push(kbr);
+      }
+      resas[mainKey]={...baseData,linkedKeys};
+
+    } else if(fStd&&fStd.id==='laser2'){
+      // 2 parties: idéalement Salle I créneau 1 + Salle II créneau 2
+      // Si Salle I créneau 1 est prise -> inverser: Salle II créneau 1 + Salle I créneau 2
+      const slot2=addSlots(startSlot,1);
+      const s1Libre=!resas[dk+'|'+startSlot+'|s1']||!!resas[dk+'|'+startSlot+'|s1'].linkedTo;
+      const s2Libre=!resas[dk+'|'+startSlot+'|s2']||!!resas[dk+'|'+startSlot+'|s2'].linkedTo;
+      const s1slot2Libre=!resas[dk+'|'+slot2+'|s1']||!!resas[dk+'|'+slot2+'|s1'].linkedTo;
+      const s2slot2Libre=!resas[dk+'|'+slot2+'|s2']||!!resas[dk+'|'+slot2+'|s2'].linkedTo;
+
+      let salle1,salle2;
+      if(s1Libre&&s2slot2Libre){
+        // Cas normal: S1 créneau 1 + S2 créneau 2
+        salle1='s1';salle2='s2';
+      } else if(s2Libre&&s1slot2Libre){
+        // Inversé: S2 créneau 1 + S1 créneau 2
+        salle1='s2';salle2='s1';
+      } else {
+        alert('⚠️ Impossible de placer les 2 parties consécutives à '+ds(startSlot)+'.\nLes salles I et II sont toutes deux occupées.');
+        return;
+      }
+
+      const mainKey=dk+'|'+startSlot+'|'+salle1;
+      const k2=dk+'|'+slot2+'|'+salle2;
+      const linkedKeys=[k2];
+      resas[k2]={...baseData,linkedTo:mainKey,role:'Partie 2 ('+SALLE_LABELS[salle2]+')'};
+      resas[mainKey]={...baseData,linkedKeys};
+
+    } else {
+      // Réservation simple sur la salle choisie — ne jamais écraser une autre résa indépendante
+      const targetKey=dk+'|'+startSlot+'|'+salle;
+      const existing=resas[targetKey];
+      if(existing&&!existing.linkedTo&&editKey!==targetKey){
+        // Déjà occupé par quelqu'un d'autre: on écrase seulement si l'utilisateur confirme
+        if(!confirm('Ce créneau est déjà occupé par '+esc(existing.nom||'')+'\nVoulez-vous vraiment le remplacer ?'))return;
+      }
+      resas[targetKey]=baseData;
+    }
+  }
+
+  save();closeModal();render();toast('✅ Réservation enregistrée !');
+}
+
+function deleteResa(){
+  if(!editKey)return;
+  if(!confirm('Supprimer cette réservation ?'))return;
+  supprimerAvecLiens(editKey);
+  save();closeModal();render();toast('🗑️ Réservation supprimée.');
+}
+
+// Supprime une résa et tous ses créneaux liés (dans les deux sens)
+function supprimerAvecLiens(key){
+  const r=resas[key];
+  if(!r)return;
+  // Supprimer les liés (si c'est la résa principale)
+  if(r.linkedKeys){
+    r.linkedKeys.forEach(lk=>{delete resas[lk];});
+  }
+  // Si c'est un créneau lié, remonter au parent et tout supprimer
+  if(r.linkedTo){
+    const parentKey=r.linkedTo;
+    const parent=resas[parentKey];
+    if(parent&&parent.linkedKeys){
+      parent.linkedKeys.forEach(lk=>{delete resas[lk];});
+    }
+    delete resas[parentKey];
+  }
+  delete resas[key];
+}
+
+// CALENDRIER
+function openCalModal(){calViewDate=new Date(currentDate);renderCalModal();document.getElementById('modal-cal').style.display='';}
+function closeCalModal(){document.getElementById('modal-cal').style.display='none';}
+function calNav(n){calViewDate.setMonth(calViewDate.getMonth()+n);renderCalModal();}
+function renderCalModal(){
+  const y=calViewDate.getFullYear(),m=calViewDate.getMonth();
+  document.getElementById('cal-month-title').textContent=MONTHS[m]+' '+y;
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  const offset=firstDay===0?6:firstDay-1;
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  ['Lu','Ma','Me','Je','Ve','Sa','Di'].forEach(d=>{const h=document.createElement('div');h.className='cal-day-header';h.textContent=d;grid.appendChild(h);});
+  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(y,m,day),dk=dateKey(d),dow=d.getDay();
+    const sched=getEffectiveSchedule(dk,dow),ex=exceptions[dk];
+    let cls='cal-day';
+    if(!sched.open)cls+=' closed';
+    if(ex)cls+=ex.closed?' has-ex closed-ex':' has-ex';
+    if(d.getTime()===today.getTime())cls+=' today';
+    const el=document.createElement('div');
+    el.className=cls;
+    el.innerHTML=`<span>${day}</span>${ex?'<div class="cal-dot"></div>':''}`;
+    el.onclick=()=>openExModalForDate(dk);
+    grid.appendChild(el);
+  }
+  renderExList();
+}
+function renderExList(){
+  const list=document.getElementById('ex-list');
+  const sorted=Object.entries(exceptions).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(!sorted.length){list.innerHTML='<div style="font-size:12px;color:var(--c-muted);padding:6px 0">Aucune exception enregistrée.</div>';return;}
+  list.innerHTML='';
+  sorted.forEach(([dk,ex])=>{
+    const d=new Date(dk+'T12:00:00');
+    const label=DAYS_FULL[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+    const info=ex.closed?'Fermé exceptionnellement':`${ex.start}–${ex.end}`;
+    const item=document.createElement('div');
+    item.className='ex-item '+(ex.closed?'closed-ex':'open-ex');
+    item.innerHTML=`<div class="ex-date">${label}</div><div class="ex-info">${esc(info)}${ex.note?' · '+esc(ex.note):''}</div><button class="ex-del" onclick="deleteExKey('${dk}')">✕</button>`;
+    list.appendChild(item);
+  });
+}
+function openExModalForDate(dk){
+  exEditKey=dk;
+  const d=new Date(dk+'T12:00:00');
+  document.getElementById('ex-sub').textContent=DAYS_FULL[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+  const ex=exceptions[dk];
+  document.getElementById('ex-closed').checked=ex?ex.closed:false;
+  document.getElementById('ex-start').value=ex&&!ex.closed?ex.start:'10:00';
+  document.getElementById('ex-end').value=ex&&!ex.closed?ex.end:'18:00';
+  document.getElementById('ex-note').value=ex?ex.note||'':'';
+  document.getElementById('ex-btn-del').style.display=ex?'':'none';
+  toggleExClosed();
+  document.getElementById('modal-ex').style.display='';
+}
+function closeExModal(){document.getElementById('modal-ex').style.display='none';}
+function toggleExClosed(){document.getElementById('ex-hours').style.display=document.getElementById('ex-closed').checked?'none':'';}
+function saveException(){
+  const closed=document.getElementById('ex-closed').checked;
+  const ex={closed,note:document.getElementById('ex-note').value.trim()};
+  if(!closed){ex.start=document.getElementById('ex-start').value;ex.end=document.getElementById('ex-end').value;}
+  exceptions[exEditKey]=ex;saveEx();
+  closeExModal();
+  if(document.getElementById('modal-cal').style.display!=='none')renderCalModal();
+  render();toast('✅ Jour spécial enregistré !');
+}
+function deleteException(){if(!confirm('Supprimer cette exception ?'))return;deleteExKey(exEditKey);closeExModal();}
+function deleteExKey(dk){delete exceptions[dk];saveEx();if(document.getElementById('modal-cal').style.display!=='none')renderCalModal();render();toast('🗑️ Exception supprimée.');}
+
+// ── STATISTIQUES
+let statPeriod='month';
+
+function openStats(){
+  renderStats();
+  document.getElementById('modal-stats').style.display='';
+}
+function closeStats(){document.getElementById('modal-stats').style.display='none';}
+function setStatPeriod(p){statPeriod=p;renderStats();}
+
+function getDateRange(p){
+  const now=new Date();now.setHours(0,0,0,0);
+  let from=new Date(now),to=new Date(now);
+  if(p==='week'){
+    const dow=now.getDay()===0?6:now.getDay()-1;
+    from.setDate(now.getDate()-dow);
+    to.setDate(from.getDate()+6);
+  } else if(p==='month'){
+    from=new Date(now.getFullYear(),now.getMonth(),1);
+    to=new Date(now.getFullYear(),now.getMonth()+1,0);
+  } else if(p==='year'){
+    from=new Date(now.getFullYear(),0,1);
+    to=new Date(now.getFullYear(),11,31);
+  } else {
+    // all: de la première à la dernière résa
+    const keys=Object.keys(resas);
+    if(!keys.length)return{from:now,to:now};
+    const dates=keys.map(k=>k.split('|')[0]).filter(Boolean).sort();
+    from=new Date(dates[0]+'T12:00:00');
+    to=new Date(dates[dates.length-1]+'T12:00:00');
+  }
+  return{from,to};
+}
+
+function iterDays(from,to,cb){
+  const d=new Date(from);
+  while(d<=to){cb(new Date(d));d.setDate(d.getDate()+1);}
+}
+
+function renderStats(){
+  const {from,to}=getDateRange(statPeriod);
+  const labels={week:'Cette semaine',month:'Ce mois ('+MONTHS[new Date().getMonth()]+')',year:'Cette année '+new Date().getFullYear(),all:'Toutes les réservations'};
+  document.getElementById('stats-period-label').textContent=labels[statPeriod]||'';
+
+  // Boutons période
+  ['week','month','year','all'].forEach(p=>{
+    document.getElementById('sp-'+p).className='fbtn'+(statPeriod===p?' sel':'');
+  });
+
+  // Collecter les données
+  let totalResas=0,totalJoueurs=0,joursActifs=0;
+  const formuleCounts={};
+  const salleCounts={s1:0,s2:0,sbr:0};
+  const sallePlayers={s1:0,s2:0};
+  const salleSlots={s1:0,s2:0,sbr:0}; // créneaux occupés
+  const joursMap={}; // dk -> {resas, joueurs}
+  const anniversaires=[];
+
+  // Compter les créneaux ouverts par salle pour le taux de remplissage
+  let totalCreneaux={s1:0,s2:0,sbr:0};
+  iterDays(from,to,d=>{
+    const sched=getEffectiveSchedule(dateKey(d),d.getDay());
+    const slots=getSlotsForSchedule(sched);
+    totalCreneaux.s1+=slots.length;
+    totalCreneaux.s2+=slots.length;
+    totalCreneaux.sbr+=slots.length;
+  });
+
+  Object.entries(resas).forEach(([key,r])=>{
+    if(r.linkedTo)return; // ignorer les créneaux liés, compter seulement les principaux
+    const parts=key.split('|');
+    const dk=parts[0],salle=parts[2];
+    const d=new Date(dk+'T12:00:00');
+    if(d<from||d>to)return;
+
+    totalResas++;
+    totalJoueurs+=(r.count||0);
+    if(!joursMap[dk])joursMap[dk]={resas:0,joueurs:0};
+    joursMap[dk].resas++;joursMap[dk].joueurs+=(r.count||0);
+
+    // Formules
+    const fl=r.formule||'Sans formule';
+    formuleCounts[fl]=(formuleCounts[fl]||0)+1;
+
+    // Salles (compter créneaux occupés incluant les liés)
+    const keysToCount=[key,...(r.linkedKeys||[])];
+    keysToCount.forEach(k=>{
+      const s=k.split('|')[2];
+      if(s&&salleCounts[s]!==undefined)salleCounts[s]++;
+    });
+
+    // Joueurs par salle (s1+s2 seulement, pas sbr)
+    if(salle==='s1'||salle==='s2')sallePlayers[salle]+=(r.count||0);
+
+    // Anniversaires
+    if(r.type==='an'){
+      anniversaires.push({dk,d,r,key});
+    }
+  });
+
+  joursActifs=Object.keys(joursMap).length;
+  const moyResas=joursActifs?Math.round(totalResas/joursActifs*10)/10:0;
+  const moyJoueurs=joursActifs?Math.round(totalJoueurs/joursActifs):0;
+
+  // Taux de remplissage
+  const tauxS1=totalCreneaux.s1?Math.round(salleCounts.s1/totalCreneaux.s1*100):0;
+  const tauxS2=totalCreneaux.s2?Math.round(salleCounts.s2/totalCreneaux.s2*100):0;
+  const tauxSbr=totalCreneaux.sbr?Math.round(salleCounts.sbr/totalCreneaux.sbr*100):0;
+
+  // Formules triées
+  const formulesSorted=Object.entries(formuleCounts).sort((a,b)=>b[1]-a[1]);
+  const maxFormule=formulesSorted.length?formulesSorted[0][1]:1;
+
+  // Anniversaires triés par date
+  const today=new Date();today.setHours(0,0,0,0);
+  anniversaires.sort((a,b)=>a.d-b.d);
+  const annivAVenir=anniversaires.filter(a=>a.d>=today);
+  const annivPasses=anniversaires.filter(a=>a.d<today).reverse().slice(0,5);
+
+  // Jours les plus chargés
+  const joursSorted=Object.entries(joursMap).sort((a,b)=>b[1].joueurs-a[1].joueurs).slice(0,5);
+
+  let html='';
+
+  // ── CHIFFRES CLÉS
+  html+=`<div class="stats-section"><h3>Chiffres clés</h3>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="val">${totalResas}</div><div class="lbl">Réservations</div></div>
+    <div class="stat-card"><div class="val">${totalJoueurs}</div><div class="lbl">Joueurs</div></div>
+    <div class="stat-card"><div class="val">${joursActifs}</div><div class="lbl">Jours avec résa</div></div>
+    <div class="stat-card"><div class="val">${moyJoueurs}</div><div class="lbl">Joueurs / jour actif</div></div>
+  </div></div>`;
+
+  // ── TAUX DE REMPLISSAGE
+  html+=`<div class="stats-section"><h3>Taux de remplissage</h3>`;
+  [{id:'s1',label:'Salle I',taux:tauxS1,cls:''},{id:'s2',label:'Salle II',taux:tauxS2,cls:'s2'},{id:'sbr',label:'Salle Privée',taux:tauxSbr,cls:'sbr'}].forEach(s=>{
+    html+=`<div class="bar-row">
+      <div class="bar-label">${s.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${s.taux}%;background:${s.id==='s1'?'var(--c-s1b)':s.id==='s2'?'var(--c-s2b)':'var(--c-brb)'}"></div></div>
+      <div class="bar-val">${s.taux}%</div>
+    </div>`;
+  });
+  html+=`<div style="font-size:11px;color:var(--c-muted);margin-top:4px">Basé sur les créneaux ouverts sur la période</div></div>`;
+
+  // ── FORMULES
+  if(formulesSorted.length){
+    html+=`<div class="stats-section"><h3>Formules populaires</h3>`;
+    formulesSorted.slice(0,8).forEach(([label,count])=>{
+      const pct=Math.round(count/maxFormule*100);
+      html+=`<div class="bar-row">
+        <div class="bar-label" title="${esc(label)}">${esc(label.length>28?label.slice(0,26)+'…':label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <div class="bar-val">${count}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // ── JOURS LES PLUS CHARGÉS
+  if(joursSorted.length){
+    html+=`<div class="stats-section"><h3>Jours les plus chargés</h3>`;
+    const maxJ=joursSorted[0][1].joueurs||1;
+    joursSorted.forEach(([dk,info])=>{
+      const d=new Date(dk+'T12:00:00');
+      const label=DAYS_FULL[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()];
+      const pct=Math.round(info.joueurs/maxJ*100);
+      html+=`<div class="bar-row">
+        <div class="bar-label">${esc(label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--c-s2b)"></div></div>
+        <div class="bar-val">${info.joueurs} j.</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // ── ANNIVERSAIRES
+  html+=`<div class="stats-section"><h3>Anniversaires${statPeriod==='all'?' — à venir':''}</h3>`;
+  const annivShow=statPeriod==='all'?annivAVenir:[...annivAVenir,...annivPasses].sort((a,b)=>b.d-a.d);
+  if(!annivShow.length){
+    html+=`<div style="font-size:13px;color:var(--c-muted)">Aucun anniversaire sur cette période.</div>`;
+  } else {
+    html+=`<table class="anniv-table"><thead><tr>
+      <th>Date</th><th>Contact</th><th>Enfant</th><th>Formule</th><th>Gâteau</th>
+    </tr></thead><tbody>`;
+    annivShow.forEach(({dk,d,r})=>{
+      const isPast=d<today;
+      const label=DAYS_FULL[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+      const gateau=r.gateau&&r.gateau!=='autre'?r.gateau:(r.gateauCustom||'');
+      const gateauCmd=r.gateauCommande?'<span class="badge-gateau">✅ commandé</span>':'<span style="color:#dc2626;font-size:11px">⏳ à commander</span>';
+      html+=`<tr class="${isPast?'past':''}">
+        <td style="white-space:nowrap">${label}</td>
+        <td>${esc(r.nom||'')} ${esc(r.prenom||'')}<br><span style="color:var(--c-muted);font-size:11px">${esc(r.phone||'')}</span></td>
+        <td><span class="badge-an">🎂 ${esc(r.child||'?')} ${r.age?r.age+' ans':''}</span></td>
+        <td style="font-size:11px">${esc(r.formule||'')}</td>
+        <td>${gateau?`<span style="font-size:11px">${esc(gateau)}</span><br>${gateauCmd}`:(r.formuleId==='a1g'||r.formuleId==='a2g'?gateauCmd:'—')}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>`;
+  }
+  html+=`</div>`;
+
+  document.getElementById('stats-content').innerHTML=html;
+}
+
+function handleSlotClick(el){
+  const key=el.getAttribute('data-key');
+  if(key)openEdit(key);
+}
+function handleEmptyClick(el){
+  const dk=el.getAttribute('data-dk');
+  const slot=el.getAttribute('data-slot');
+  const salle=el.getAttribute('data-salle');
+  if(dk&&slot&&salle)openNew(dk,slot,salle);
+}
+
+function checkOtherSalleWarning(dk,slot,salle){
+  const warn=document.getElementById('other-salle-warning');
+  if(!warn)return;
+  // Ne vérifier que pour Salle I et Salle II
+  if(salle!=='s1'&&salle!=='s2'){warn.style.display='none';return;}
+  const otherSalle=salle==='s1'?'s2':'s1';
+  const otherR=getResa(dk,slot,otherSalle);
+  if(otherR&&!otherR.linkedTo){
+    const nom=(otherR.nom||'')+(otherR.prenom?' '+otherR.prenom:'');
+    const count=otherR.count?` (${otherR.count} pers.)`:'';
+    const salleLabel=SALLE_LABELS[otherSalle];
+    warn.innerHTML=`⚠️ <strong>${salleLabel} déjà occupée</strong> sur ce créneau — ${esc(nom)}${esc(count)}<br><span style="font-size:11px">Si ce groupe dépasse 14 personnes, les deux salles sont peut-être déjà prises pour eux.</span>`;
+    warn.style.display='';
+  } else if(otherR&&otherR.linkedTo){
+    const mainR=resas[otherR.linkedTo];
+    const nom=mainR?(mainR.nom||'')+(mainR.prenom?' '+mainR.prenom:''):'';
+    const count=mainR&&mainR.count?` (${mainR.count} pers.)`:'';
+    warn.innerHTML=`⚠️ <strong>${SALLE_LABELS[otherSalle]} déjà réservée</strong> (liée à ${esc(nom)}${esc(count)})`;
+    warn.style.display='';
+  } else {
+    warn.style.display='none';
+  }
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCalModal();closeExModal();closeStats();}});
+
+function updateAperitivePreview(){
+  const prev=document.getElementById('aperitive-preview');
+  if(!prev)return;
+  const f=FORMULES_STD.find(x=>x.id===selFormule);
+  if(!f||(f.id!=='laser2'&&!f.aperitive)){prev.style.display='none';return;}
+  const slot=newCtx?newCtx.slot:(editKey?editKey.split('|')[1]:null);
+  if(!slot){prev.style.display='none';return;}
+  let html=`<strong>Créneaux réservés automatiquement :</strong><br>`;
+  if(f.id==='laser2'){
+    const slot2=addSlots(slot,1);
+    const dk2=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
+    const s1Libre=dk2&&(!resas[dk2+'|'+slot+'|s1']||!!resas[dk2+'|'+slot+'|s1'].linkedTo);
+    const salle1=s1Libre?'Salle I':'Salle II';
+    const salle2=s1Libre?'Salle II':'Salle I';
+    html+=`${salle1} : ${ds(slot)} (1ère partie)<br>`;
+    html+=`${salle2} : ${ds(slot2)} (2ème partie)`;
+  } else {
+    const sbr=[];for(let i=0;i<3;i++)sbr.push(addSlots(slot,i));
+    html+=`Salle I : ${ds(slot)}<br>`;
+    html+=`Salle Privée : ${sbr.map(ds).join(', ')}<br>`;
+    html+=`<span style="font-size:11px;margin-top:4px;display:block">${esc(f.detail||'')}</span>`;
+  }
+  prev.innerHTML=html;prev.style.display='';
+}
+
+buildFormuleGrid('formule-grid',FORMULES_STD,'',id=>{selFormule=id;document.getElementById('f-formule-txt').style.display=id==='autre'?'':'none';});
+buildFormuleGrid('formule-an-grid',FORMULES_AN,'',id=>{selFormuleAn=id;checkGateauVisible();});
+
+// ── SYNCHRONISATION GOOGLE SHEETS
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwEC4GRm6t5JCYxgFWOy6szR7VyodUiESet6UxtUReT-ATRn0JUTy6ZqCxnh9tmSDKuCA/exec';
+let syncTimeout=null;
+
+function showSyncStatus(msg,color){
+  const el=document.getElementById('sync-status');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=color||'rgba(255,255,255,.6)';
+}
+
+async function loadFromSheets(){
+  showSyncStatus('⟳ Chargement…');
+  try{
+    const [r1,r2]=await Promise.all([
+      fetch(SCRIPT_URL+'?action=getAll').then(r=>r.json()),
+      fetch(SCRIPT_URL+'?action=getExceptions').then(r=>r.json())
+    ]);
+    if(r1.ok&&Object.keys(r1.data).length>0){
+      resas=r1.data;
+      localStorage.setItem('fl_v6',JSON.stringify(resas));
+    }
+    if(r2.ok&&Object.keys(r2.data).length>0){
+      exceptions=r2.data;
+      localStorage.setItem('fl_ex',JSON.stringify(exceptions));
+    }
+    showSyncStatus('✓ Synchronisé','#6ee7b7');
+    render();
+  }catch(err){
+    showSyncStatus('⚠ Hors ligne','#fca5a5');
+    console.warn('Sheets inaccessible, mode local',err);
+  }
+}
+
+async function syncSet(key,value){
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'set',key,value})});
+  }catch(err){console.warn('Sync set échoué',err);}
+}
+
+async function syncDelete(key){
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'delete',key})});
+  }catch(err){console.warn('Sync delete échoué',err);}
+}
+
+async function syncAll(){
+  showSyncStatus('⟳ Sauvegarde…');
+  try{
+    const r=await fetch(SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({action:'syncAll',reservations:resas,exceptions})
+    }).then(r=>r.json());
+    showSyncStatus(r.ok?'✓ Synchronisé':'⚠ Erreur',r.ok?'#6ee7b7':'#fca5a5');
+  }catch(err){
+    showSyncStatus('⚠ Hors ligne','#fca5a5');
+  }
+}
+
+function refreshFromSheets(){loadFromSheets();}
+
+// Intercepter save() pour déclencher sync
+const _save=save;
+save=function(){
+  _save();
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(syncAll,1500);
+};
+
+// Intercepter saveEx() pour déclencher sync
+const _saveEx=saveEx;
+saveEx=function(){
+  _saveEx();
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(syncAll,1500);
+};
+
+// Démarrage
+loadFromSheets();
+render();
+</script>
+</body>
+</html>
