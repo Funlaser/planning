@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -11,7 +12,7 @@
     --c-s1:#fff3b0;--c-s1b:#d4b800;--c-s1t:#5c4d00;--c-s1h:#fef08a;
     --c-s2:#dbeafe;--c-s2b:#3b82f6;--c-s2t:#1e3a8a;--c-s2h:#bfdbfe;
     --c-br:#dcfce7;--c-brb:#16a34a;--c-brt:#14532d;--c-brh:#bbf7d0;
-    --c-an:#fce7f3;--c-anb:#ec4899;--c-ant:#831843;
+    --c-an:#ede9fe;--c-anb:#7c3aed;--c-ant:#4c1d95;
     --c-special:#f0e6ff;--c-specialb:#7c3aed;--c-specialt:#4c1d95;
     --r:8px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
   }
@@ -71,6 +72,8 @@
   .slot.sbr{background:var(--c-br);color:var(--c-brt);border:1px solid var(--c-brb);}
   .slot.an{background:var(--c-an);color:var(--c-ant);border:1px solid var(--c-anb);}
   .slot.an-linked{background:var(--c-an);color:var(--c-ant);border:1px dashed var(--c-anb);opacity:.7;cursor:pointer;}
+  .slot.laser-linked{background:#e0f2fe;color:#0c4a6e;border:1px dashed #0284c7;opacity:.75;cursor:pointer;}
+  .slot.orphelin{background:#fee2e2;color:#991b1b;border:1px dashed #fca5a5;opacity:.8;cursor:pointer;}
   .sn{font-weight:600;font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .sb{font-size:10px;background:rgba(0,0,0,.08);border-radius:10px;padding:1px 5px;white-space:nowrap;flex-shrink:0;}
 
@@ -185,21 +188,31 @@
   .fill-bar.sbr{background:var(--c-br);}
 
   @media print {
-    body{background:#fff;font-size:11px;}
+    body{background:#fff;font-size:13px;}
     .topbar,.legend,.stats-bar,.no-print,.special-badge{display:none!important;}
     .main{padding:0;max-width:100%;}
-    .day-table{border:1px solid #999;border-radius:0;}
-    .day-table th,.day-table td{border-color:#999;}
-    .th-1{background:#fff8cc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .th-2{background:#dbeafe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .th-b{background:#dcfce7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .slot.s1,.slot.an{background:#fff8cc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .slot.s2{background:#dbeafe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .slot.sbr,.slot.an-linked{background:#dcfce7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .day-table{border:2px solid #333;border-radius:0;border-collapse:collapse;}
+    .day-table th{font-size:13px;font-weight:700;padding:10px 8px;border-bottom:2px solid #333;}
+    .day-table td{font-size:13px;padding:5px 6px;border-bottom:1px solid #bbb;}
+    /* Séparateurs verticaux entre salles */
+    .day-table th.th-1,.day-table td:nth-child(2),.day-table td:nth-child(3){border-right:2px solid #555;}
+    .day-table th.th-2,.day-table td:nth-child(4),.day-table td:nth-child(5){border-right:2px solid #555;}
+    .th-t{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .th-1{background:#fef08a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#5c4d00!important;}
+    .th-2{background:#bfdbfe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#1e3a8a!important;}
+    .th-b{background:#bbf7d0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#14532d!important;}
+    .slot.s1,.slot.an{background:#fef08a!important;color:#1a1916!important;border:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.s2{background:#bfdbfe!important;color:#1a1916!important;border:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.sbr,.slot.an-linked{background:#bbf7d0!important;color:#1a1916!important;border:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .slot.empty{display:none;}
+    .sn{font-size:13px;font-weight:600;}
+    .sb{font-size:11px;}
+    .td-t{font-size:12px;font-weight:600;color:#333!important;}
+    .td-q{font-size:12px;font-weight:600;color:#333!important;}
     .print-header{display:block!important;}
+    .row-full td{background:#fff0f0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
-  .print-header{display:none;text-align:center;padding:10px 0 16px;font-size:16px;font-weight:600;}
+  .print-header{display:none;text-align:center;padding:10px 0 16px;font-size:18px;font-weight:700;border-bottom:2px solid #333;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -236,6 +249,7 @@
     <div class="li"><div class="ld" style="background:var(--c-s2);border:1px solid var(--c-s2b)"></div>Salle II</div>
     <div class="li"><div class="ld" style="background:var(--c-br);border:1px solid var(--c-brb)"></div>Salle Privée</div>
     <div class="li"><div class="ld" style="background:var(--c-an);border:1px solid var(--c-anb)"></div>Anniversaire</div>
+    <div class="li"><div class="ld" style="background:#e0f2fe;border:1px dashed #0284c7"></div>Créneau lié</div>
     <div class="li"><div class="ld" style="background:var(--c-special);border:1px solid var(--c-specialb)"></div>Jour spécial</div>
   </div>
   <div id="alert-zone"></div>
@@ -275,6 +289,17 @@
     <div class="stitle">Formule</div>
     <div class="formule-grid" id="formule-grid"></div>
     <input type="text" id="f-formule-txt" style="display:none;margin-top:6px;width:100%;padding:7px 10px;border:1px solid var(--c-border);border-radius:var(--r);font-size:13px;font-family:var(--font);background:var(--c-bg);color:var(--c-text);" placeholder="Préciser la formule…"/>
+    <div id="laser2-options" style="display:none;margin-top:8px">
+      <div class="field">
+        <label>Délai avant la 2ème partie</label>
+        <select id="f-laser2-delay" onchange="updateAperitivePreview()">
+          <option value="1">30 min après (créneau suivant)</option>
+          <option value="2">1h après (+1 créneau de décalage)</option>
+          <option value="3">1h30 après (+2 créneaux de décalage)</option>
+          <option value="4">2h après (+3 créneaux de décalage)</option>
+        </select>
+      </div>
+    </div>
     <div style="margin-top:10px">
       <div class="check-row"><input type="checkbox" id="f-ok-partenaire"/><label for="f-ok-partenaire">✅ OK avec le partenaire</label></div>
       <div class="check-row"><input type="checkbox" id="f-nb-valide"/><label for="f-nb-valide">✅ Nombre de personnes validé</label></div>
@@ -297,6 +322,12 @@
     </div>
     <div class="stitle">Formule anniversaire</div>
     <div class="formule-grid" id="formule-an-grid"></div>
+    <div id="anniv-ordre-section" style="display:none;margin-top:8px">
+      <div class="check-row">
+        <input type="checkbox" id="f-privee-apres" onchange="updateAnnivPreview()"/>
+        <label for="f-privee-apres">🔄 Salle privée <strong>après</strong> le jeu (pas en même temps)</label>
+      </div>
+    </div>
     <div id="gateau-section" style="display:none;margin-top:10px">
       <div class="stitle" style="border-top:none;padding-top:0">Choix du gâteau</div>
       <div class="gateau-grid" id="gateau-grid"></div>
@@ -308,12 +339,42 @@
     <div id="gateau-commande-row" style="display:none;margin-top:6px">
       <div class="check-row"><input type="checkbox" id="f-gateau-commande"/><label for="f-gateau-commande">🎂 Gâteau commandé</label></div>
     </div>
-    <div class="field" style="margin-top:8px"><label>Divers / allergies / notes</label><textarea id="f-notes-an" placeholder="Allergies, demandes spéciales…"></textarea></div>
+    <div class="field" style="margin-top:8px">
+      <label>Nb personnes salle privée <span style="font-weight:400;text-transform:none;font-size:11px">(si différent du groupe)</span></label>
+      <input type="number" id="f-count-sbr" min="1" max="50" placeholder="Laisser vide = même groupe"/>
+    </div>
+    <div class="field"><label>Divers / allergies / notes</label><textarea id="f-notes-an" placeholder="Allergies, demandes spéciales…"></textarea></div>
   </div>
   <div class="modal-actions">
     <button class="btn btn-x" onclick="closeModal()">Annuler</button>
     <button class="btn btn-d" id="btn-del" onclick="deleteResa()" style="display:none">Supprimer</button>
+    <button class="btn" id="btn-switch" onclick="switchSalle()" style="display:none;background:#f0e6ff;color:#4c1d95;border-color:#7c3aed;flex:0.8">⇄ Changer salle</button>
+    <button class="btn" id="btn-move" onclick="openMoveModal()" style="display:none;background:#e0f2fe;color:#0c4a6e;border-color:#0284c7;flex:0.8">↗ Déplacer</button>
     <button class="btn btn-s" onclick="saveResa()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL DÉPLACER -->
+<div class="modal-bg" id="modal-move" style="display:none" onclick="if(event.target===this)closeMoveModal()">
+<div class="modal" style="max-width:380px">
+  <div class="mh">
+    <div><div class="mt">↗ Déplacer la réservation</div><div class="ms" id="move-sub"></div></div>
+    <button class="mc" onclick="closeMoveModal()">✕</button>
+  </div>
+  <div class="field">
+    <label>Nouveau jour</label>
+    <input type="date" id="move-date"/>
+  </div>
+  <div class="field">
+    <label>Nouvelle heure de début</label>
+    <select id="move-slot"></select>
+  </div>
+  <div id="move-preview" style="display:none;margin-top:8px;background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--r);padding:10px 12px;font-size:12px;line-height:1.8;color:var(--c-text)"></div>
+  <div id="move-warning" style="display:none;margin-top:8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--r);padding:8px 12px;font-size:12px;color:#92400e;"></div>
+  <div class="modal-actions">
+    <button class="btn btn-x" onclick="closeMoveModal()">Annuler</button>
+    <button class="btn btn-s" onclick="confirmMove()">Confirmer le déplacement</button>
   </div>
 </div>
 </div>
@@ -477,16 +538,35 @@ function getSlotsForSchedule(sched){
 
 // Calcule les créneaux occupés par un anniversaire
 // Retourne { s1:[slots], s2:[slots], sbr:[slots] }
-function getAnnivSlots(startSlot, parties){
-  const s1=[startSlot];
+// priveeApres=true -> salle privée commence après la dernière partie
+function getAnnivSlots(startSlot, parties, priveeApres=false, salleDepart='s1'){
+  // salleDepart: salle de la 1ère partie ('s1' ou 's2')
+  // Pour 2 parties: salle1=salleDepart, salle2=l'autre
+  const autresSalle=salleDepart==='s1'?'s2':'s1';
+  const s1=[startSlot]; // créneau 1ère partie (dans salleDepart)
   const s2=parties===2?[addSlots(startSlot,1)]:[];
-  // Salle privée: du début jusqu'à 1h après la fin du jeu
-  // 1 partie: jeu=1 slot(30min), privée pendant 3 slots (1h30 total)
-  // 2 parties: jeu=2 slots(1h), privée pendant 4 slots (2h total)
-  const sbrCount=parties===1?3:4;
+  // Début de la salle privée
+  // Normal: dès le début (startSlot)
+  // Après: après la dernière partie (startSlot+1 pour 1 partie, startSlot+2 pour 2 parties)
+  const sbrStart=priveeApres?parties:0;
+  // Durée privée: toujours 2 créneaux (1h) après le jeu
+  const sbrCount=2;
   const sbr=[];
-  for(let i=0;i<sbrCount;i++)sbr.push(addSlots(startSlot,i));
-  return{s1,s2,sbr};
+  for(let i=0;i<sbrCount+parties;i++){
+    const slot=addSlots(startSlot,sbrStart+i);
+    if(i<sbrCount)sbr.push(slot);
+  }
+  // En mode "privée après": sbr = 2 créneaux après la fin du jeu
+  if(priveeApres){
+    const sbrAfter=[];
+    for(let i=0;i<sbrCount;i++)sbrAfter.push(addSlots(startSlot,parties+i));
+    return{s1,s2,sbr:sbrAfter};
+  }
+  // Mode normal: privée pendant tout (jeu + 1h après)
+  const sbrNormal=[];
+  const sbrCountNormal=parties===1?3:4;
+  for(let i=0;i<sbrCountNormal;i++)sbrNormal.push(addSlots(startSlot,i));
+  return{s1,s2,sbr:sbrNormal};
 }
 
 // Compte les joueurs sur un créneau (s1+s2 seulement)
@@ -596,15 +676,23 @@ function renderDay(){
     const r1=getResa(dk,slot,'s1'),r2=getResa(dk,slot,'s2'),rb=getResa(dk,slot,'sbr');
     const players=countPlayers(dk,slot);
     const full=players>=MAX_PLAYERS;
-    const warnQ=players>0&&players<MAX_PLAYERS;
     const rowCls=full?' class="row-full"':'';
+    // Nombre par salle individuel
+    const c1=r1?(r1.count||0):0;
+    const c2=r2?(r2.count||0):0;
+    const cb=rb?(rb.count||0):0;
+    // Pour les créneaux liés (anniversaire/apéritif), afficher le count du parent
+    const c1display=c1>0?c1:(r1&&r1.linkedTo&&resas[r1.linkedTo]?resas[r1.linkedTo].count||0:0);
+    const c2display=c2>0?c2:(r2&&r2.linkedTo&&resas[r2.linkedTo]?resas[r2.linkedTo].count||0:0);
+    // cbdisplay: utiliser directement le count du créneau sbr (déjà correct)
+    const cbdisplay=rb?(rb.count||0):0;
     html+=`<tr${rowCls}><td class="td-t">${ds(slot)}</td>
       <td>${slotHtml(dk,slot,'s1',r1)}</td>
-      <td class="td-q${full?' warn':''}">${players>0?players:''}</td>
+      <td class="td-q${full?' warn':''}">${c1display>0?c1display:''}</td>
       <td>${slotHtml(dk,slot,'s2',r2)}</td>
-      <td class="td-q"></td>
+      <td class="td-q">${c2display>0?c2display:''}</td>
       <td>${slotHtml(dk,slot,'sbr',rb)}</td>
-      <td class="td-q"></td></tr>`;
+      <td class="td-q">${cbdisplay>0?cbdisplay:''}</td></tr>`;
   });
   html+='</tbody></table>';
   html+=`<div style="margin-top:10px;text-align:center" class="no-print"><button class="abtn special" onclick="openExModalForDate('${dk}')">${sched.isEx?'Modifier le jour spécial':'✨ Ajouter ouverture / fermeture spéciale'}</button></div>`;
@@ -614,15 +702,31 @@ function renderDay(){
 function slotHtml(dk,slot,salle,r){
   if(r){
     const isLinked=!!r.linkedTo;
-    const cls=isLinked?'an-linked':(r.type==='an'?'an':salle);
+    const isOrphelin=isLinked&&r.linkedTo&&!resas[r.linkedTo];
+    let cls;
+    if(isOrphelin) cls='orphelin';
+    else if(isLinked) cls=(r.type==='an'?'an-linked':'laser-linked');
+    else cls=(r.type==='an'?'an':salle);
     const name=r.type==='an'||isLinked?esc(r.nom||'')+(r.child?' 🎂 '+esc(r.child):''):esc((r.nom||'')+(r.prenom?' '+r.prenom:''));
     const gateauBadge=r.gateauCommande?'<span class="sb" style="background:rgba(236,72,153,.15);color:#831843">✅ gâteau</span>':'';
-    const badge=isLinked?`<span class="sb">${salle==='sbr'?'Privée liée':'Partie liée'}</span>`:(r.formule?`<span class="sb">${esc(r.formule.substring(0,18))}</span>${gateauBadge}`:gateauBadge);
-    // Utiliser data-key pour éviter les problèmes d'échappement dans onclick
-    const targetKey=isLinked?(r.linkedTo||dk+'|'+slot+'|'+salle):(dk+'|'+slot+'|'+salle);
-    return `<div class="slot ${cls}" data-key="${esc(targetKey)}" onclick="handleSlotClick(this)"><span class="sn">${name}</span>${badge}</div>`;
+    const noteSymbol=(!isLinked&&r.notes&&r.notes.trim())?'<span class="sb" title="'+esc(r.notes)+'" style="background:rgba(234,179,8,.2);color:#854d0e">📝</span>':'';
+    const badge=isLinked?`<span class="sb">${salle==='sbr'?'Privée liée':'Partie liée'}</span>`:(r.formule?`<span class="sb">${esc(r.formule.substring(0,18))}</span>${gateauBadge}${noteSymbol}`:gateauBadge+noteSymbol);
+    const ownKey=dk+'|'+slot+'|'+salle;
+    const targetKey=(!isLinked||isOrphelin)?ownKey:(r.linkedTo||ownKey);
+    const orphelinAttr=isOrphelin?' data-orphelin="1"':'';
+    const orphelinBadge=isOrphelin?'<span class="sb" style="background:#fee2e2;color:#991b1b">✕ orphelin</span>':'';
+    return `<div class="slot ${cls}" data-key="${esc(targetKey)}"${orphelinAttr} onclick="handleSlotClick(this)"><span class="sn">${name}</span>${badge}${orphelinBadge}</div>`;
   }
-  return `<div class="slot empty" data-dk="${esc(dk)}" data-slot="${esc(slot)}" data-salle="${salle}" onclick="handleEmptyClick(this)">+</div>`;
+  // Vérifier si c'est un créneau de rangement (sbr précédent occupé)
+  let emptyContent='+';
+  if(salle==='sbr'){
+    const prevSlot=fromMin(toMin(slot)-30);
+    const prevR=getResa(dk,prevSlot,'sbr');
+    if(prevR){
+      emptyContent='<span style="font-size:11px;color:#d97706" title="Créneau de rangement recommandé">🧹</span>';
+    }
+  }
+  return `<div class="slot empty" data-dk="${esc(dk)}" data-slot="${esc(slot)}" data-salle="${salle}" onclick="handleEmptyClick(this)">${emptyContent}</div>`;
 }
 
 // WEEK VIEW
@@ -666,6 +770,11 @@ function goDay(dk){const p=dk.split('-');currentDate=new Date(+p[0],+p[1]-1,+p[2
 // ANNIVERSAIRE — calcul et aperçu
 function getAnFormule(){return FORMULES_AN.find(x=>x.id===selFormuleAn)||null;}
 
+function getPriveeApres(){
+  const el=document.getElementById('f-privee-apres');
+  return el?el.checked:false;
+}
+
 function updateAnnivPreview(){
   const prev=document.getElementById('anniv-preview');
   if(!newCtx&&!editKey){prev.style.display='none';return;}
@@ -673,11 +782,21 @@ function updateAnnivPreview(){
   if(!f){prev.style.display='none';return;}
   const slot=newCtx?newCtx.slot:(editKey?editKey.split('|')[1]:null);
   if(!slot){prev.style.display='none';return;}
-  const {s1,s2,sbr}=getAnnivSlots(slot,f.parties);
+  const priveeApres=getPriveeApres();
+  const dk2=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
+  // Détecter quelle salle sera utilisée
+  let sallePreview='s1';
+  if(dk2){
+    const s1Occupe=resas[dk2+'|'+slot+'|s1']&&!resas[dk2+'|'+slot+'|s1'].linkedTo;
+    if(s1Occupe)sallePreview='s2';
+  }
+  const autrePreview=sallePreview==='s1'?'s2':'s1';
+  const {s1,s2,sbr}=getAnnivSlots(slot,f.parties,priveeApres,sallePreview);
   let html=`<strong>Créneaux réservés automatiquement :</strong><br>`;
-  html+=`Salle I : ${s1.map(ds).join(', ')}<br>`;
-  if(s2.length)html+=`Salle II : ${s2.map(ds).join(', ')}<br>`;
+  html+=`${SALLE_LABELS[sallePreview]} : ${s1.map(ds).join(', ')}<br>`;
+  if(s2.length)html+=`${SALLE_LABELS[autrePreview]} : ${s2.map(ds).join(', ')}<br>`;
   html+=`Salle Privée : ${sbr.map(ds).join(', ')}`;
+  if(priveeApres)html+=`<br><span style="font-size:11px">🔄 Salle privée après le jeu</span>`;
   prev.innerHTML=html;prev.style.display='';
 }
 
@@ -688,9 +807,32 @@ function buildFormuleGrid(cId,formules,selId,onSel){
     const btn=document.createElement('button');
     btn.className='fbtn'+(selId===f.id?' sel':'');
     btn.innerHTML=esc(f.label)+(f.prix?`<span class="prix">${esc(f.prix)}</span>`:'');
-    btn.onclick=()=>{onSel(f.id);buildFormuleGrid(cId,formules,f.id,onSel);};
+    btn.onclick=()=>{
+      // Mettre à jour la variable globale DIRECTEMENT avant tout le reste
+      if(cId==='formule-an-grid') selFormuleAn=f.id;
+      if(cId==='formule-grid') selFormule=f.id;
+      onSel(f.id);
+      buildFormuleGrid(cId,formules,f.id,onSel);
+      if(cId==='formule-an-grid'){checkGateauVisible();}
+      if(cId==='formule-grid'){
+        document.getElementById('f-formule-txt').style.display=f.id==='autre'?'':'none';
+        document.getElementById('laser2-options').style.display=f.id==='laser2'?'':'none';
+        if(f.id==='laser2')autoDetectLaser2Delay();
+        updateAperitivePreview();
+      }
+    };
     el.appendChild(btn);
   });
+  // Si une formule est déjà sélectionnée au chargement, forcer l'affichage
+  if(selId&&cId==='formule-an-grid'){
+    selFormuleAn=selId;
+    checkGateauVisible();
+  }
+  if(selId&&cId==='formule-grid'){
+    selFormule=selId;
+    document.getElementById('laser2-options').style.display=selId==='laser2'?'':'none';
+    updateAperitivePreview();
+  }
 }
 function buildGateauGrid(dow){
   const isSun=dow===0,el=document.getElementById('gateau-grid');el.innerHTML='';
@@ -711,9 +853,22 @@ function buildGateauGrid(dow){
 function checkGateauVisible(){
   const f=getAnFormule();
   const hasGateau=!!(f&&f.gateau);
+  const hasFormule=!!f;
   document.getElementById('gateau-section').style.display=hasGateau?'':'none';
   document.getElementById('gateau-commande-row').style.display=hasGateau?'':'none';
-  if(!hasGateau)document.getElementById('f-gateau-commande').checked=false;
+  document.getElementById('anniv-ordre-section').style.display=hasFormule?'':'none';
+  if(!hasGateau){
+    document.getElementById('f-gateau-commande').checked=false;
+    selGateau='';
+  }
+  if(hasGateau){
+    const grid=document.getElementById('gateau-grid');
+    if(grid&&grid.children.length===0){
+      const dk=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
+      const dow=dk?new Date(dk+'T12:00:00').getDay():new Date().getDay();
+      buildGateauGrid(dow);
+    }
+  }
   updateAnnivPreview();
 }
 
@@ -725,7 +880,7 @@ function setType(t){
   document.getElementById('std-fields').style.display=t==='std'?'':'none';
   document.getElementById('an-fields').style.display=t==='an'?'':'none';
   document.getElementById('salle-field').style.display=t==='an'?'none':'';
-  if(t==='an')updateAnnivPreview();
+  if(t==='an'){checkGateauVisible();updateAnnivPreview();}
 }
 
 // MODAL RÉSERVATION
@@ -737,6 +892,8 @@ function openNew(dk,slot,salle){
   document.getElementById('btn-del').style.display='none';
   // Avertissement si l'autre salle est occupée sur ce créneau
   checkOtherSalleWarning(dk,slot,salle);
+  // Avertissement rangement salle privée
+  if(salle==='sbr') checkRangementWarning(dk,slot);
   document.getElementById('modal').style.display='';
   updateAperitivePreview();
   setTimeout(()=>document.getElementById('f-nom').focus(),50);
@@ -754,9 +911,15 @@ function openEdit(k){
   if(r.type==='an'){
     ['child','age','dob','address','npa','ville'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
     document.getElementById('f-notes-an').value=r.notes||'';
+    document.getElementById('f-count-sbr').value=r.countSbr||'';
+    document.getElementById('f-privee-apres').checked=r.priveeApres||false;
     selFormuleAn=r.formuleId||'';
     buildFormuleGrid('formule-an-grid',FORMULES_AN,selFormuleAn,id=>{selFormuleAn=id;checkGateauVisible();});
-    checkGateauVisible();selGateau=r.gateau||'';buildGateauGrid(dow);
+    // Forcer l'affichage du gâteau si la formule chargée en a un
+    checkGateauVisible();
+    selGateau=r.gateau||'';buildGateauGrid(dow);
+    // Re-appeler après buildGateauGrid pour s'assurer que tout est visible
+    checkGateauVisible();
     if(r.gateau==='autre'){document.getElementById('f-gateau-custom').style.display='';document.getElementById('f-gateau-custom').value=r.gateauCustom||'';}
     document.getElementById('f-gateau-commande').checked=r.gateauCommande||false;
   }else{
@@ -769,6 +932,8 @@ function openEdit(k){
     if(r.formuleId==='autre'){document.getElementById('f-formule-txt').style.display='';document.getElementById('f-formule-txt').value=r.formuleCustom||'';}
   }
   document.getElementById('btn-del').style.display='';
+  document.getElementById('btn-switch').style.display='';
+  document.getElementById('btn-move').style.display='';
   document.getElementById('modal').style.display='';
   setTimeout(()=>document.getElementById('f-nom').focus(),50);
 }
@@ -780,7 +945,14 @@ function clearModal(){
   document.getElementById('f-ok-partenaire').checked=false;document.getElementById('f-nb-valide').checked=false;
   selGateau='';selFormule='';selFormuleAn='';
   const gcEl=document.getElementById('f-gateau-commande');if(gcEl)gcEl.checked=false;
+  const cSbrEl=document.getElementById('f-count-sbr');if(cSbrEl)cSbrEl.value='';
+  const paEl=document.getElementById('f-privee-apres');if(paEl)paEl.checked=false;
+  const aoEl=document.getElementById('anniv-ordre-section');if(aoEl)aoEl.style.display='none';
+  const bsEl=document.getElementById('btn-switch');if(bsEl)bsEl.style.display='none';
+  const bmEl=document.getElementById('btn-move');if(bmEl)bmEl.style.display='none';
   const gcRow=document.getElementById('gateau-commande-row');if(gcRow)gcRow.style.display='none';
+  const l2=document.getElementById('laser2-options');if(l2)l2.style.display='none';
+  const l2d=document.getElementById('f-laser2-delay');if(l2d)l2d.value='1';
   document.getElementById('gateau-section').style.display='none';
   document.getElementById('f-gateau-custom').style.display='none';
   document.getElementById('f-formule-txt').style.display='none';
@@ -832,12 +1004,15 @@ function saveResa(){
     baseData.gateau=selGateau;
     baseData.gateauCustom=document.getElementById('f-gateau-custom').value.trim();
     baseData.gateauCommande=document.getElementById('f-gateau-commande').checked;
+    const cSbr=parseInt(document.getElementById('f-count-sbr').value)||0;
+    baseData.countSbr=cSbr>0?cSbr:0;
   }else{
     baseData.entreprise=document.getElementById('f-entreprise').value.trim();
     baseData.okPartenaire=document.getElementById('f-ok-partenaire').checked;
     baseData.nbValide=document.getElementById('f-nb-valide').checked;
     baseData.notes=document.getElementById('f-notes-std').value.trim();
     baseData.formuleCustom=document.getElementById('f-formule-txt').value.trim();
+    baseData.laser2Delay=parseInt(document.getElementById('f-laser2-delay')?.value||'1');
   }
 
   // Si on édite, supprimer les anciens créneaux liés
@@ -854,19 +1029,57 @@ function saveResa(){
   if(resaType==='an'&&dk&&startSlot&&getAnFormule()){
     // ANNIVERSAIRE: réservation multi-créneaux automatique
     const f=getAnFormule();
-    const {s1,s2,sbr}=getAnnivSlots(startSlot,f.parties);
-    const mainKey=dk+'|'+s1[0]+'|s1';
+    const priveeApres=getPriveeApres();
+    baseData.priveeApres=priveeApres;
+    const {s1,s2,sbr}=getAnnivSlots(startSlot,f.parties,priveeApres);
+
+    // Collecter toutes les clés qui seront utilisées (hors édition en cours)
+    const oldLinkedKeys=editKey?(resas[editKey]?.linkedKeys||[]):[];
+    const oldGroupKeys=editKey?[editKey,...oldLinkedKeys]:[];
+
+    // Détecter la meilleure salle de départ (S1 si libre, sinon S2)
+    const sbrCount=baseData.countSbr>0?baseData.countSbr:baseData.count;
+
+    const isLibre=(key)=>{
+      const rx=resas[key];
+      if(!rx)return true; // vide
+      if(oldGroupKeys.includes(key))return true; // notre propre groupe
+      return false; // occupé par quelqu'un d'autre (lié ou non)
+    };
+
+    // Tester S1 en premier, puis S2
+    let salleChoisie=null;
+    for(const sd of ['s1','s2']){
+      const autreS=sd==='s1'?'s2':'s1';
+      const {s1:ts1,s2:ts2,sbr:tsbr}=getAnnivSlots(startSlot,f.parties,priveeApres,sd);
+      const mainK=dk+'|'+ts1[0]+'|'+sd;
+      if(!isLibre(mainK))continue;
+      if(ts2.length&&!isLibre(dk+'|'+ts2[0]+'|'+autreS))continue;
+      const sbrOk=tsbr.every(sl=>isLibre(dk+'|'+sl+'|sbr'));
+      if(!sbrOk)continue;
+      salleChoisie=sd;
+      break;
+    }
+
+    if(!salleChoisie){
+      alert('⚠️ Impossible de placer cet anniversaire à '+ds(startSlot)+'.\nLes salles sont déjà occupées sur ce créneau.');
+      return;
+    }
+
+    // Recalculer avec la salle choisie
+    const autresSalle=salleChoisie==='s1'?'s2':'s1';
+    const {s1:fs1,s2:fs2,sbr:fsbr}=getAnnivSlots(startSlot,f.parties,priveeApres,salleChoisie);
+    const mainKey=dk+'|'+fs1[0]+'|'+salleChoisie;
+
     const linkedKeys=[];
-    // Salle II si 2 parties
-    if(s2.length){
-      const k2=dk+'|'+s2[0]+'|s2';
+    if(fs2.length){
+      const k2=dk+'|'+fs2[0]+'|'+autresSalle;
       resas[k2]={...baseData,linkedTo:mainKey,role:'Partie 2'};
       linkedKeys.push(k2);
     }
-    // Salle Privée (tous les créneaux)
-    sbr.forEach((sbrSlot,i)=>{
+    fsbr.forEach((sbrSlot,i)=>{
       const kbr=dk+'|'+sbrSlot+'|sbr';
-      resas[kbr]={...baseData,linkedTo:mainKey,role:'Salle Privée'};
+      resas[kbr]={...baseData,count:sbrCount,linkedTo:mainKey,role:'Salle Privée'};
       linkedKeys.push(kbr);
     });
     resas[mainKey]={...baseData,linkedKeys};
@@ -880,9 +1093,10 @@ function saveResa(){
       // Apéritive: Salle I créneau 1 + Salle Privée 3 créneaux
       const mainKey=dk+'|'+startSlot+'|s1';
       const linkedKeys=[];
+      const apSbrCount=baseData.countSbr>0?baseData.countSbr:baseData.count;
       for(let i=0;i<3;i++){
         const kbr=dk+'|'+addSlots(startSlot,i)+'|sbr';
-        resas[kbr]={...baseData,linkedTo:mainKey,role:'Salle Privée'};
+        resas[kbr]={...baseData,count:apSbrCount,linkedTo:mainKey,role:'Salle Privée'};
         linkedKeys.push(kbr);
       }
       resas[mainKey]={...baseData,linkedKeys};
@@ -890,21 +1104,40 @@ function saveResa(){
     } else if(fStd&&fStd.id==='laser2'){
       // 2 parties: idéalement Salle I créneau 1 + Salle II créneau 2
       // Si Salle I créneau 1 est prise -> inverser: Salle II créneau 1 + Salle I créneau 2
-      const slot2=addSlots(startSlot,1);
-      const s1Libre=!resas[dk+'|'+startSlot+'|s1']||!!resas[dk+'|'+startSlot+'|s1'].linkedTo;
-      const s2Libre=!resas[dk+'|'+startSlot+'|s2']||!!resas[dk+'|'+startSlot+'|s2'].linkedTo;
-      const s1slot2Libre=!resas[dk+'|'+slot2+'|s1']||!!resas[dk+'|'+slot2+'|s1'].linkedTo;
-      const s2slot2Libre=!resas[dk+'|'+slot2+'|s2']||!!resas[dk+'|'+slot2+'|s2'].linkedTo;
+      const laser2Delay=parseInt(document.getElementById('f-laser2-delay')?.value||'1');
+      let slot2=addSlots(startSlot,laser2Delay);
+      const editGroupKeys=editKey?[editKey,...(resas[editKey]?.linkedKeys||[])]:[];
+      const l2Libre=(k)=>{
+        const r2=resas[k];
+        if(!r2)return true;
+        if(editGroupKeys.includes(k))return true;
+        return false;
+      };
+      const s1Libre=l2Libre(dk+'|'+startSlot+'|s1');
+      const s2Libre=l2Libre(dk+'|'+startSlot+'|s2');
+      const s1slot2Libre=l2Libre(dk+'|'+slot2+'|s1');
+      const s2slot2Libre=l2Libre(dk+'|'+slot2+'|s2');
 
-      let salle1,salle2;
-      if(s1Libre&&s2slot2Libre){
-        // Cas normal: S1 créneau 1 + S2 créneau 2
-        salle1='s1';salle2='s2';
-      } else if(s2Libre&&s1slot2Libre){
-        // Inversé: S2 créneau 1 + S1 créneau 2
-        salle1='s2';salle2='s1';
-      } else {
-        alert('⚠️ Impossible de placer les 2 parties consécutives à '+ds(startSlot)+'.\nLes salles I et II sont toutes deux occupées.');
+      // Essayer les 4 combinaisons possibles avec le délai choisi
+      let salle1=null,salle2=null;
+      if(s1Libre&&s2slot2Libre){salle1='s1';salle2='s2';}
+      else if(s2Libre&&s1slot2Libre){salle1='s2';salle2='s1';}
+      else if(s1Libre&&s1slot2Libre){salle1='s1';salle2='s1';} // même salle
+      else if(s2Libre&&s2slot2Libre){salle1='s2';salle2='s2';} // même salle
+
+      // Si toujours bloqué, essayer avec d'autres délais (1 à 4)
+      if(!salle1){
+        for(let tryDelay=1;tryDelay<=4;tryDelay++){
+          if(tryDelay===laser2Delay)continue;
+          const trySlot2=addSlots(startSlot,tryDelay);
+          const ts1=l2Libre(dk+'|'+trySlot2+'|s1');
+          const ts2=l2Libre(dk+'|'+trySlot2+'|s2');
+          if(s1Libre&&ts2){salle1='s1';salle2='s2';slot2=trySlot2;break;}
+          if(s2Libre&&ts1){salle1='s2';salle2='s1';slot2=trySlot2;break;}
+        }
+      }
+      if(!salle1){
+        alert('⚠️ Impossible de placer les 2 parties à '+ds(startSlot)+'.\nAucune combinaison de salles disponible.');
         return;
       }
 
@@ -937,6 +1170,227 @@ function deleteResa(){
 }
 
 // Supprime une résa et tous ses créneaux liés (dans les deux sens)
+// ── DÉPLACEMENT
+function openMoveModal(){
+  if(!editKey)return;
+  const r=resas[editKey];
+  const parts=editKey.split('|');
+  const dk=parts[0],slot=parts[1];
+
+  document.getElementById('move-sub').textContent=
+    (r.nom||'')+(r.prenom?' '+r.prenom:'')+' · '+ds(slot);
+
+  // Pré-remplir avec la date/heure actuelle
+  document.getElementById('move-date').value=dk;
+
+  // Remplir les créneaux selon le jour actuel
+  updateMoveSlots(dk,slot);
+
+  document.getElementById('move-date').onchange=function(){
+    updateMoveSlots(this.value,null);
+    updateMovePreview();
+  };
+  document.getElementById('move-slot').onchange=updateMovePreview;
+
+  updateMovePreview();
+  document.getElementById('modal-move').style.display='';
+}
+
+function updateMoveSlots(dk,currentSlot){
+  const d=new Date(dk+'T12:00:00');
+  const sched=getEffectiveSchedule(dk,d.getDay());
+  const slots=getSlotsForSchedule(sched);
+  const sel=document.getElementById('move-slot');
+  sel.innerHTML='';
+  if(!slots.length){
+    sel.innerHTML='<option>Jour fermé</option>';
+    return;
+  }
+  slots.forEach(s=>{
+    const opt=document.createElement('option');
+    opt.value=s;
+    opt.textContent=ds(s);
+    if(s===currentSlot)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function updateMovePreview(){
+  if(!editKey)return;
+  const r=resas[editKey];
+  const newDk=document.getElementById('move-date').value;
+  const newSlot=document.getElementById('move-slot').value;
+  const prev=document.getElementById('move-preview');
+  const warn=document.getElementById('move-warning');
+  if(!newDk||!newSlot){prev.style.display='none';warn.style.display='none';return;}
+
+  const parts=editKey.split('|');
+  const oldDk=parts[0],oldSlot=parts[1];
+  const diffMin=toMin(newSlot)-toMin(oldSlot);
+  const diffDay=(new Date(newDk+'T12:00:00')-new Date(oldDk+'T12:00:00'))/(1000*60*60*24);
+
+  // Calculer les nouveaux créneaux
+  const allKeys=[editKey,...(r.linkedKeys||[])];
+  const newKeys=allKeys.map(k=>{
+    const p=k.split('|');
+    const newS=addSlots(p[1],diffMin/30);
+    const newD=new Date(new Date(p[0]+'T12:00:00').getTime()+diffDay*24*60*60*1000);
+    return{old:k,newDk:dateKey(newD),newSlot:newS,salle:p[2]};
+  });
+
+  let html='<strong>Nouveaux créneaux :</strong><br>';
+  let hasConflict=false;
+  newKeys.forEach(({old:ok,newDk:nd,newSlot:ns,salle})=>{
+    const newKey=nd+'|'+ns+'|'+salle;
+    const existing=resas[newKey];
+    const conflict=existing&&!allKeys.includes(newKey);
+    if(conflict)hasConflict=true;
+    html+=`${SALLE_LABELS[salle]} : ${ds(ns)}${nd!==oldDk?' ('+nd+')':''}${conflict?' ⚠️ OCCUPÉ':''}<br>`;
+  });
+  prev.innerHTML=html;prev.style.display='';
+
+  if(hasConflict){
+    warn.textContent='⚠️ Certains créneaux sont déjà occupés. Vérifiez avant de confirmer.';
+    warn.style.display='';
+  } else {
+    warn.style.display='none';
+  }
+}
+
+function closeMoveModal(){document.getElementById('modal-move').style.display='none';}
+
+function confirmMove(){
+  if(!editKey)return;
+  const r=resas[editKey];
+  const newDk=document.getElementById('move-date').value;
+  const newSlot=document.getElementById('move-slot').value;
+  if(!newDk||!newSlot)return;
+
+  const parts=editKey.split('|');
+  const oldDk=parts[0],oldSlot=parts[1];
+  const diffMin=toMin(newSlot)-toMin(oldSlot);
+  const diffDay=(new Date(newDk+'T12:00:00')-new Date(oldDk+'T12:00:00'))/(1000*60*60*24);
+
+  const allKeys=[editKey,...(r.linkedKeys||[])];
+
+  // Vérifier les conflits
+  const newEntries=allKeys.map(k=>{
+    const p=k.split('|');
+    const newS=addSlots(p[1],diffMin/30);
+    const newD=new Date(new Date(p[0]+'T12:00:00').getTime()+diffDay*24*60*60*1000);
+    return{oldKey:k,newKey:dateKey(newD)+'|'+newS+'|'+p[2],data:{...resas[k]}};
+  });
+
+  const hasConflict=newEntries.some(({newKey})=>{
+    return resas[newKey]&&!allKeys.includes(newKey);
+  });
+
+  if(hasConflict){
+    if(!confirm('Certains créneaux sont déjà occupés. Continuer quand même ?'))return;
+  }
+
+  // Trouver la nouvelle mainKey
+  const newMainEntry=newEntries.find(e=>e.oldKey===editKey);
+  const newMainKey=newMainEntry.newKey;
+
+  // Supprimer les anciennes clés
+  allKeys.forEach(k=>delete resas[k]);
+
+  // Créer les nouvelles en mettant à jour les références
+  newEntries.forEach(({newKey,data})=>{
+    const newData={...data};
+    if(newData.linkedTo===editKey) newData.linkedTo=newMainKey;
+    if(newData.linkedKeys){
+      newData.linkedKeys=newEntries
+        .filter(e=>e.oldKey!==editKey)
+        .map(e=>e.newKey);
+    }
+    resas[newKey]=newData;
+  });
+
+  save();
+  closeMoveModal();
+  closeModal();
+  render();
+  toast('✅ Réservation déplacée !');
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(syncAll,1500);
+}
+
+function switchSalle(){
+  if(!editKey)return;
+  const r=resas[editKey];
+  if(!r)return;
+
+  // Déterminer la salle actuelle et la cible
+  const parts=editKey.split('|');
+  const dk=parts[0],slot=parts[1],salleActuelle=parts[2];
+
+  // Définir les switchs possibles
+  const switches={s1:'s2',s2:'s1',sbr:'sbr'};
+  const nouvelleSalle=switches[salleActuelle]||salleActuelle;
+
+  // Vérifier si la nouvelle salle est libre (ignorer les liés du même groupe)
+  const linkedKeys=r.linkedKeys||[];
+  const allGroupKeys=[editKey,...linkedKeys];
+
+  // Collecter toutes les clés du groupe pour les switcher
+  const keysToSwitch=[];
+  allGroupKeys.forEach(k=>{
+    const p=k.split('|');
+    const ks=p[2]; // salle actuelle de ce créneau
+    let newS=ks;
+    if(ks==='s1') newS='s2';
+    else if(ks==='s2') newS='s1';
+    // sbr reste sbr
+    const newKey=p[0]+'|'+p[1]+'|'+newS;
+    // Vérifier si newKey est libre (pas occupé par quelqu'un d'autre)
+    if(resas[newKey]&&!allGroupKeys.includes(newKey)){
+      alert('⚠️ Impossible de changer de salle — '+SALLE_LABELS[newS]+' à '+ds(p[1])+' est déjà occupée par un autre groupe.');
+      return;
+    }
+    keysToSwitch.push({oldKey:k,newKey,data:resas[k]});
+  });
+
+  if(keysToSwitch.length!==allGroupKeys.length)return; // erreur détectée
+
+  // Supprimer les anciennes clés
+  allGroupKeys.forEach(k=>delete resas[k]);
+
+  // Recréer avec les nouvelles clés en mettant à jour linkedTo et linkedKeys
+  const oldMainKey=editKey;
+  const newMainKey=keysToSwitch.find(x=>x.oldKey===oldMainKey)?.newKey||editKey;
+
+  keysToSwitch.forEach(({oldKey,newKey,data})=>{
+    const newData={...data};
+    // Mettre à jour linkedTo si nécessaire
+    if(newData.linkedTo===oldMainKey) newData.linkedTo=newMainKey;
+    // Mettre à jour linkedKeys si c'est la principale
+    if(oldKey===oldMainKey&&newData.linkedKeys){
+      newData.linkedKeys=keysToSwitch
+        .filter(x=>x.oldKey!==oldMainKey)
+        .map(x=>x.newKey);
+    }
+    resas[newKey]=newData;
+  });
+
+  save();
+  closeModal();
+  render();
+  toast('✅ Salle changée !');
+  // Sync
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(syncAll,1500);
+}
+
+function supprimerOrphelin(key){
+  if(!resas[key])return;
+  if(!confirm('Supprimer ce créneau isolé ?'))return;
+  delete resas[key];
+  save();render();toast('🗑️ Créneau supprimé.');
+  clearTimeout(syncTimeout);syncTimeout=setTimeout(syncAll,1500);
+}
+
 function supprimerAvecLiens(key){
   const r=resas[key];
   if(!r)return;
@@ -1231,8 +1685,27 @@ function renderStats(){
   document.getElementById('stats-content').innerHTML=html;
 }
 
+function autoDetectLaser2Delay(){
+  const slot=newCtx?newCtx.slot:(editKey?editKey.split('|')[1]:null);
+  const dk=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
+  if(!slot||!dk)return;
+  // Chercher le prochain créneau libre en S2 (ou S1 si S1 libre)
+  for(let i=1;i<=4;i++){
+    const slot2=addSlots(slot,i);
+    const s1Libre=!resas[dk+'|'+slot+'|s1']||!!resas[dk+'|'+slot+'|s1'].linkedTo;
+    const targetSalle=s1Libre?'s2':'s1';
+    const r=resas[dk+'|'+slot2+'|'+targetSalle];
+    if(!r||r.linkedTo){
+      // Créneau libre trouvé
+      document.getElementById('f-laser2-delay').value=String(i);
+      return;
+    }
+  }
+}
+
 function handleSlotClick(el){
   const key=el.getAttribute('data-key');
+  if(el.getAttribute('data-orphelin')){supprimerOrphelin(key);return;}
   if(key)openEdit(key);
 }
 function handleEmptyClick(el){
@@ -1240,6 +1713,19 @@ function handleEmptyClick(el){
   const slot=el.getAttribute('data-slot');
   const salle=el.getAttribute('data-salle');
   if(dk&&slot&&salle)openNew(dk,slot,salle);
+}
+
+function checkRangementWarning(dk,slot){
+  const warn=document.getElementById('other-salle-warning');
+  if(!warn)return;
+  // Vérifier si le créneau précédent en Salle Privée est occupé
+  const prevSlot=fromMin(toMin(slot)-30);
+  const prevR=getResa(dk,prevSlot,'sbr');
+  if(prevR){
+    const nom=(prevR.nom||'')+(prevR.prenom?' '+prevR.prenom:'');
+    warn.innerHTML=`⚠️ <strong>Créneau de rangement</strong> — La Salle Privée était occupée à ${ds(prevSlot)} (${esc(nom)})<br><span style="font-size:11px">Prévoir 30 min de rangement entre deux groupes.</span>`;
+    warn.style.display='';
+  }
 }
 
 function checkOtherSalleWarning(dk,slot,salle){
@@ -1266,7 +1752,7 @@ function checkOtherSalleWarning(dk,slot,salle){
   }
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCalModal();closeExModal();closeStats();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCalModal();closeExModal();closeStats();closeMoveModal();}});
 
 function updateAperitivePreview(){
   const prev=document.getElementById('aperitive-preview');
@@ -1277,13 +1763,15 @@ function updateAperitivePreview(){
   if(!slot){prev.style.display='none';return;}
   let html=`<strong>Créneaux réservés automatiquement :</strong><br>`;
   if(f.id==='laser2'){
-    const slot2=addSlots(slot,1);
+    const delay=parseInt(document.getElementById('f-laser2-delay')?.value||'1');
+    const slot2=addSlots(slot,delay);
     const dk2=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
     const s1Libre=dk2&&(!resas[dk2+'|'+slot+'|s1']||!!resas[dk2+'|'+slot+'|s1'].linkedTo);
     const salle1=s1Libre?'Salle I':'Salle II';
     const salle2=s1Libre?'Salle II':'Salle I';
     html+=`${salle1} : ${ds(slot)} (1ère partie)<br>`;
     html+=`${salle2} : ${ds(slot2)} (2ème partie)`;
+    if(delay>1)html+=`<br><span style="font-size:11px;color:var(--c-ant)">⚠ Créneau ${ds(addSlots(slot,1))} libre entre les deux parties</span>`;
   } else {
     const sbr=[];for(let i=0;i<3;i++)sbr.push(addSlots(slot,i));
     html+=`Salle I : ${ds(slot)}<br>`;
