@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -164,6 +163,29 @@
   .toast.show{opacity:1;}
   .alert-banner{background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--r);padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:8px;}
 
+  /* CONTACTS */
+  .contacts-modal{max-width:700px;max-height:90vh;overflow-y:auto;}
+  .contacts-tabs{display:flex;gap:6px;margin-bottom:1rem;}
+  .ctab{flex:1;padding:8px;border:1px solid var(--c-border);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;background:var(--c-bg);color:var(--c-muted);text-align:center;}
+  .ctab.active{background:var(--c-text);color:#fff;border-color:var(--c-text);}
+  .contact-card{background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;}
+  .contact-card:hover{border-color:var(--c-text);}
+  .cc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .cc-name{font-weight:600;font-size:14px;}
+  .cc-badge{font-size:11px;background:var(--c-surface);border:1px solid var(--c-border);border-radius:10px;padding:2px 8px;color:var(--c-muted);}
+  .cc-rows{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;}
+  .cc-row{display:flex;gap:6px;}
+  .cc-label{color:var(--c-muted);min-width:70px;flex-shrink:0;}
+  .cc-val{color:var(--c-text);font-weight:500;}
+  .cc-venues{margin-top:8px;padding-top:8px;border-top:1px solid var(--c-border);}
+  .cc-venue{font-size:11px;color:var(--c-muted);margin-bottom:2px;}
+  .anniv-urgent{border-left:3px solid #ef4444;}
+  .anniv-soon{border-left:3px solid #f59e0b;}
+  .anniv-normal{border-left:3px solid #10b981;}
+  .search-bar{width:100%;padding:8px 12px;border:1px solid var(--c-border);border-radius:var(--r);font-size:13px;font-family:var(--font);background:var(--c-bg);color:var(--c-text);margin-bottom:12px;outline:none;}
+  .search-bar:focus{border-color:var(--c-text);}
+  .empty-state{text-align:center;padding:30px;color:var(--c-muted);font-size:13px;}
+
   /* STATS */
   .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem;}
   .stat-card{background:var(--c-bg);border-radius:var(--r);padding:12px 14px;text-align:center;}
@@ -235,6 +257,7 @@
   <div class="tbg">
     <button class="abtn special" onclick="openCalModal()">📅 Calendrier</button>
     <button class="abtn" onclick="openStats()" style="border-color:#34d399;color:#6ee7b7">📊 Stats</button>
+    <button class="abtn" onclick="openContacts()" style="border-color:#fb923c;color:#fed7aa">👥 Contacts</button>
     <button class="abtn" id="btn-print" onclick="printDay()">🖨️ Imprimer</button>
     <button class="abtn" onclick="exportData()">💾 Exporter</button>
     <button class="abtn" onclick="document.getElementById('imp').click()">📂 Importer</button>
@@ -259,7 +282,7 @@
 </div>
 
 <!-- MODAL RÉSERVATION -->
-<div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+<div class="modal-bg" id="modal" style="display:none">
 <div class="modal">
   <div class="mh">
     <div><div class="mt" id="modal-title">Réservation</div><div class="ms" id="modal-sub"></div></div>
@@ -298,6 +321,10 @@
           <option value="3">1h30 après (+2 créneaux de décalage)</option>
           <option value="4">2h après (+3 créneaux de décalage)</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Nb joueurs 2ème partie <span style="font-weight:400;text-transform:none;font-size:11px">(si différent)</span></label>
+        <input type="number" id="f-count2" min="1" max="25" placeholder="Laisser vide = même nombre"/>
       </div>
     </div>
     <div style="margin-top:10px">
@@ -351,6 +378,26 @@
     <button class="btn" id="btn-switch" onclick="switchSalle()" style="display:none;background:#f0e6ff;color:#4c1d95;border-color:#7c3aed;flex:0.8">⇄ Changer salle</button>
     <button class="btn" id="btn-move" onclick="openMoveModal()" style="display:none;background:#e0f2fe;color:#0c4a6e;border-color:#0284c7;flex:0.8">↗ Déplacer</button>
     <button class="btn btn-s" onclick="saveResa()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL CONTACTS -->
+<div class="modal-bg" id="modal-contacts" style="display:none" onclick="if(event.target===this)closeContacts()">
+<div class="modal contacts-modal">
+  <div class="mh">
+    <div><div class="mt">👥 Contacts</div><div class="ms" id="contacts-sub"></div></div>
+    <button class="mc" onclick="closeContacts()">✕</button>
+  </div>
+  <div class="contacts-tabs">
+    <button class="ctab active" id="ctab-annis" onclick="setContactTab('annis')">🎂 Anniversaires à venir</button>
+    <button class="ctab" id="ctab-entreprises" onclick="setContactTab('entreprises')">🏢 Entreprises</button>
+    <button class="ctab" id="ctab-tous" onclick="setContactTab('tous')">👤 Tous les contacts</button>
+  </div>
+  <input type="text" class="search-bar" id="contacts-search" placeholder="Rechercher…" oninput="renderContactsContent()"/>
+  <div id="contacts-content"></div>
+  <div class="modal-actions">
+    <button class="btn btn-x" onclick="closeContacts()">Fermer</button>
   </div>
 </div>
 </div>
@@ -460,6 +507,7 @@ const SCHEDULE={
 const FORMULES_STD=[
   {id:'laser1',label:'1 partie laser',prix:'',aperitive:false,parties:1,privateSalle:false},
   {id:'laser2',label:'2 parties laser',prix:'',aperitive:false,parties:2,privateSalle:false},
+  {id:'grand-groupe',label:'Grand groupe (14+ pers.) — S.I + S.II',prix:'',aperitive:false,parties:0,privateSalle:false,grandGroupe:true},
   {id:'ap27',label:'Apéritive — Boissons & snacks',prix:'CHF 27.–/pers (min 8)',aperitive:true,parties:1,privateSalle:true,
     detail:'1 partie · Salle Privée 1h · Boissons sans alcool, chips, crackers, feuilletés, cacahuètes'},
   {id:'ap37',label:'Apéritive — + Tarterie Littoral',prix:'CHF 37.–/pers (min 8)',aperitive:true,parties:1,privateSalle:true,
@@ -816,7 +864,9 @@ function buildFormuleGrid(cId,formules,selId,onSel){
       if(cId==='formule-an-grid'){checkGateauVisible();}
       if(cId==='formule-grid'){
         document.getElementById('f-formule-txt').style.display=f.id==='autre'?'':'none';
-        document.getElementById('laser2-options').style.display=f.id==='laser2'?'':'none';
+        document.getElementById('laser2-options').style.display=(f.id==='laser2'||f.id==='grand-groupe')?'':'none';
+        // Cacher le délai pour grand-groupe, garder seulement nb joueurs salle II
+        document.getElementById('f-laser2-delay').closest('.field').style.display=f.id==='grand-groupe'?'none':'';
         if(f.id==='laser2')autoDetectLaser2Delay();
         updateAperitivePreview();
       }
@@ -930,6 +980,15 @@ function openEdit(k){
     selFormule=r.formuleId||'';
     buildFormuleGrid('formule-grid',FORMULES_STD,selFormule,id=>{selFormule=id;document.getElementById('f-formule-txt').style.display=id==='autre'?'':'none';});
     if(r.formuleId==='autre'){document.getElementById('f-formule-txt').style.display='';document.getElementById('f-formule-txt').value=r.formuleCustom||'';}
+    if(r.formuleId==='laser2'||r.formuleId==='grand-groupe'){
+      const l2opt=document.getElementById('laser2-options');if(l2opt)l2opt.style.display='';
+      const delayEl=document.getElementById('f-laser2-delay');
+      if(delayEl){
+        delayEl.closest('.field').style.display=r.formuleId==='grand-groupe'?'none':'';
+        if(r.laser2Delay)delayEl.value=String(r.laser2Delay);
+      }
+      const c2el=document.getElementById('f-count2');if(c2el)c2el.value=r.count2||'';
+    }
   }
   document.getElementById('btn-del').style.display='';
   document.getElementById('btn-switch').style.display='';
@@ -953,6 +1012,7 @@ function clearModal(){
   const gcRow=document.getElementById('gateau-commande-row');if(gcRow)gcRow.style.display='none';
   const l2=document.getElementById('laser2-options');if(l2)l2.style.display='none';
   const l2d=document.getElementById('f-laser2-delay');if(l2d)l2d.value='1';
+  const c2el=document.getElementById('f-count2');if(c2el)c2el.value='';
   document.getElementById('gateau-section').style.display='none';
   document.getElementById('f-gateau-custom').style.display='none';
   document.getElementById('f-formule-txt').style.display='none';
@@ -1013,6 +1073,8 @@ function saveResa(){
     baseData.notes=document.getElementById('f-notes-std').value.trim();
     baseData.formuleCustom=document.getElementById('f-formule-txt').value.trim();
     baseData.laser2Delay=parseInt(document.getElementById('f-laser2-delay')?.value||'1');
+    const count2val=parseInt(document.getElementById('f-count2')?.value||'0')||0;
+    baseData.count2=count2val>0?count2val:0;
   }
 
   // Si on édite, supprimer les anciens créneaux liés
@@ -1144,15 +1206,33 @@ function saveResa(){
       const mainKey=dk+'|'+startSlot+'|'+salle1;
       const k2=dk+'|'+slot2+'|'+salle2;
       const linkedKeys=[k2];
-      resas[k2]={...baseData,linkedTo:mainKey,role:'Partie 2 ('+SALLE_LABELS[salle2]+')'};
+      const c2=baseData.count2>0?baseData.count2:baseData.count;
+      resas[k2]={...baseData,count:c2,linkedTo:mainKey,role:'Partie 2 ('+SALLE_LABELS[salle2]+')'};
+      resas[mainKey]={...baseData,linkedKeys};
+
+    } else if(fStd&&fStd.grandGroupe){
+      // Grand groupe: Salle I + Salle II sur le même créneau
+      const k1=dk+'|'+startSlot+'|s1';
+      const k2=dk+'|'+startSlot+'|s2';
+      // Vérifier disponibilité
+      const editGK=editKey?[editKey,...(resas[editKey]?.linkedKeys||[])]:[];
+      const ok1=!resas[k1]||editGK.includes(k1);
+      const ok2=!resas[k2]||editGK.includes(k2);
+      if(!ok1||!ok2){
+        const bloquee=!ok1?'Salle I':'Salle II';
+        alert('⚠️ '+bloquee+' est déjà occupée à '+ds(startSlot)+'.\nImpossible de placer le grand groupe.');
+        return;
+      }
+      const mainKey=k1;
+      const linkedKeys=[k2];
+      resas[k2]={...baseData,count:baseData.count2>0?baseData.count2:baseData.count,linkedTo:mainKey,role:'Grand groupe (Salle II)'};
       resas[mainKey]={...baseData,linkedKeys};
 
     } else {
-      // Réservation simple sur la salle choisie — ne jamais écraser une autre résa indépendante
+      // Réservation simple sur la salle choisie
       const targetKey=dk+'|'+startSlot+'|'+salle;
       const existing=resas[targetKey];
       if(existing&&!existing.linkedTo&&editKey!==targetKey){
-        // Déjà occupé par quelqu'un d'autre: on écrase seulement si l'utilisateur confirme
         if(!confirm('Ce créneau est déjà occupé par '+esc(existing.nom||'')+'\nVoulez-vous vraiment le remplacer ?'))return;
       }
       resas[targetKey]=baseData;
@@ -1481,6 +1561,182 @@ function saveException(){
 function deleteException(){if(!confirm('Supprimer cette exception ?'))return;deleteExKey(exEditKey);closeExModal();}
 function deleteExKey(dk){delete exceptions[dk];saveEx();if(document.getElementById('modal-cal').style.display!=='none')renderCalModal();render();toast('🗑️ Exception supprimée.');}
 
+// ── CONTACTS
+let contactTab='annis';
+
+function openContacts(){
+  contactTab='annis';
+  renderContactsContent();
+  document.getElementById('modal-contacts').style.display='';
+  document.getElementById('contacts-search').value='';
+}
+function closeContacts(){document.getElementById('modal-contacts').style.display='none';}
+function setContactTab(t){
+  contactTab=t;
+  ['annis','entreprises','tous'].forEach(id=>{
+    document.getElementById('ctab-'+id).className='ctab'+(t===id?' active':'');
+  });
+  document.getElementById('contacts-search').value='';
+  renderContactsContent();
+}
+
+function renderContactsContent(){
+  const search=document.getElementById('contacts-search').value.toLowerCase().trim();
+  const today=new Date();today.setHours(0,0,0,0);
+  const in10=new Date(today);in10.setDate(in10.getDate()+10);
+
+  if(contactTab==='annis') renderAnnis(search,today,in10);
+  else if(contactTab==='entreprises') renderEntreprises(search);
+  else renderTous(search);
+}
+
+function renderAnnis(search,today,in10){
+  const sub=document.getElementById('contacts-sub');
+  sub.textContent='Anniversaires dans les 10 prochains jours';
+  const el=document.getElementById('contacts-content');
+
+  // Collecter tous les anniversaires à venir
+  const annis=[];
+  Object.entries(resas).forEach(([key,r])=>{
+    if(r.type!=='an'||r.linkedTo)return;
+    const parts=key.split('|');
+    const d=new Date(parts[0]+'T12:00:00');
+    if(d<today||d>in10)return;
+    annis.push({key,d,r,dk:parts[0],slot:parts[1]});
+  });
+  annis.sort((a,b)=>a.d-b.d);
+
+  const filtered=search?annis.filter(({r})=>{
+    const txt=(r.nom+r.prenom+r.child+r.phone+r.email+r.entreprise).toLowerCase();
+    return txt.includes(search);
+  }):annis;
+
+  if(!filtered.length){el.innerHTML='<div class="empty-state">Aucun anniversaire dans les 10 prochains jours 🎉</div>';return;}
+
+  el.innerHTML=filtered.map(({d,r,dk,slot})=>{
+    const diff=Math.round((d-today)/(1000*60*60*24));
+    const urgClass=diff===0?'anniv-urgent':diff<=3?'anniv-soon':'anniv-normal';
+    const urgLabel=diff===0?"Aujourd'hui !":diff===1?'Demain':diff+' jours';
+    const label=DAYS_FULL[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+    const gateau=r.gateau&&r.gateau!=='autre'?r.gateau:(r.gateauCustom||'');
+    const gateauCmd=r.gateauCommande
+      ?'<span style="color:#16a34a;font-weight:600">✅ commandé</span>'
+      :'<span style="color:#dc2626;font-weight:600">⚠️ À commander !</span>';
+    return `<div class="contact-card ${urgClass}">
+      <div class="cc-header">
+        <div class="cc-name">🎂 ${esc(r.child||'?')} ${r.age?'('+r.age+' ans)':''}</div>
+        <div class="cc-badge" style="color:${diff===0?'#dc2626':diff<=3?'#d97706':'#16a34a'}">${urgLabel}</div>
+      </div>
+      <div class="cc-rows">
+        <div class="cc-row"><span class="cc-label">Date</span><span class="cc-val">${label} à ${ds(slot)}</span></div>
+        <div class="cc-row"><span class="cc-label">Contact</span><span class="cc-val">${esc(r.nom||'')} ${esc(r.prenom||'')}</span></div>
+        <div class="cc-row"><span class="cc-label">Téléphone</span><span class="cc-val">${r.phone?`<a href="tel:${esc(r.phone)}" style="color:var(--c-text)">${esc(r.phone)}</a>`:'—'}</span></div>
+        <div class="cc-row"><span class="cc-label">Email</span><span class="cc-val">${r.email?`<a href="mailto:${esc(r.email)}" style="color:var(--c-text);font-size:11px">${esc(r.email)}</a>`:'—'}</span></div>
+        <div class="cc-row"><span class="cc-label">Personnes</span><span class="cc-val">${r.count||'?'} joueurs${r.countSbr?' + '+r.countSbr+' privée':''}</span></div>
+        <div class="cc-row"><span class="cc-label">Formule</span><span class="cc-val">${esc(r.formule||'—')}</span></div>
+        ${gateau?`<div class="cc-row"><span class="cc-label">Gâteau</span><span class="cc-val">${esc(gateau)} — ${gateauCmd}</span></div>`:''}
+        ${r.address?`<div class="cc-row"><span class="cc-label">Adresse</span><span class="cc-val">${esc(r.address)}, ${esc(r.npa||'')} ${esc(r.ville||'')}</span></div>`:''}
+        ${r.notes?`<div class="cc-row" style="grid-column:1/-1"><span class="cc-label">Notes</span><span class="cc-val">${esc(r.notes)}</span></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEntreprises(search){
+  document.getElementById('contacts-sub').textContent='Entreprises ayant réservé';
+  const el=document.getElementById('contacts-content');
+
+  // Regrouper par entreprise
+  const entreprises={};
+  Object.entries(resas).forEach(([key,r])=>{
+    if(r.linkedTo||!r.entreprise)return;
+    const nom=r.entreprise.trim();
+    if(!nom)return;
+    if(!entreprises[nom])entreprises[nom]={nom,contacts:{},venues:[]};
+    const contactKey=(r.nom||'')+'|'+(r.phone||'')+'|'+(r.email||'');
+    entreprises[nom].contacts[contactKey]={nom:r.nom,prenom:r.prenom,phone:r.phone,email:r.email};
+    const parts=key.split('|');
+    const d=new Date(parts[0]+'T12:00:00');
+    entreprises[nom].venues.push({d,slot:parts[1],count:r.count,formule:r.formule});
+  });
+
+  const sorted=Object.values(entreprises).sort((a,b)=>a.nom.localeCompare(b.nom));
+  const filtered=search?sorted.filter(e=>e.nom.toLowerCase().includes(search)||
+    Object.values(e.contacts).some(c=>((c.nom||'')+(c.prenom||'')+(c.phone||'')+(c.email||'')).toLowerCase().includes(search))):sorted;
+
+  if(!filtered.length){el.innerHTML='<div class="empty-state">Aucune entreprise trouvée.</div>';return;}
+
+  el.innerHTML=filtered.map(e=>{
+    const contacts=Object.values(e.contacts);
+    const venuesSorted=e.venues.sort((a,b)=>b.d-a.d);
+    const totalJoueurs=e.venues.reduce((s,v)=>s+(v.count||0),0);
+    return `<div class="contact-card">
+      <div class="cc-header">
+        <div class="cc-name">🏢 ${esc(e.nom)}</div>
+        <div class="cc-badge">${e.venues.length} venue${e.venues.length>1?'s':''} · ${totalJoueurs} joueurs</div>
+      </div>
+      ${contacts.map(c=>`<div class="cc-rows" style="margin-bottom:4px">
+        <div class="cc-row"><span class="cc-label">Contact</span><span class="cc-val">${esc(c.nom||'')} ${esc(c.prenom||'')}</span></div>
+        <div class="cc-row"><span class="cc-label">Tél.</span><span class="cc-val">${c.phone?`<a href="tel:${esc(c.phone)}" style="color:var(--c-text)">${esc(c.phone)}</a>`:'—'}</span></div>
+        <div class="cc-row"><span class="cc-label">Email</span><span class="cc-val">${c.email?`<a href="mailto:${esc(c.email)}" style="color:var(--c-text);font-size:11px">${esc(c.email)}</a>`:'—'}</span></div>
+      </div>`).join('')}
+      <div class="cc-venues">
+        ${venuesSorted.slice(0,5).map(v=>`<div class="cc-venue">📅 ${DAYS_SHORT[v.d.getDay()]} ${v.d.getDate()} ${MONTHS[v.d.getMonth()]} ${v.d.getFullYear()} — ${v.count||'?'} pers. — ${esc(v.formule||'')}</div>`).join('')}
+        ${venuesSorted.length>5?`<div class="cc-venue">+ ${venuesSorted.length-5} autre(s)…</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTous(search){
+  document.getElementById('contacts-sub').textContent='Tous les contacts';
+  const el=document.getElementById('contacts-content');
+
+  // Regrouper par contact (nom+téléphone)
+  const contacts={};
+  Object.entries(resas).forEach(([key,r])=>{
+    if(r.linkedTo)return;
+    const contactKey=((r.nom||'').toUpperCase()+'|'+(r.phone||'')).trim();
+    if(!contactKey||contactKey==='|')return;
+    if(!contacts[contactKey]){
+      contacts[contactKey]={nom:r.nom,prenom:r.prenom,phone:r.phone,email:r.email,
+        entreprise:r.entreprise,venues:[],isAnniv:false};
+    }
+    const parts=key.split('|');
+    const d=new Date(parts[0]+'T12:00:00');
+    contacts[contactKey].venues.push({d,slot:parts[1],count:r.count,formule:r.formule,type:r.type});
+    if(r.type==='an')contacts[contactKey].isAnniv=true;
+  });
+
+  const sorted=Object.values(contacts).sort((a,b)=>(a.nom||'').localeCompare(b.nom||''));
+  const filtered=search?sorted.filter(c=>{
+    const txt=((c.nom||'')+(c.prenom||'')+(c.phone||'')+(c.email||'')+(c.entreprise||'')).toLowerCase();
+    return txt.includes(search);
+  }):sorted;
+
+  if(!filtered.length){el.innerHTML='<div class="empty-state">Aucun contact trouvé.</div>';return;}
+
+  el.innerHTML=filtered.map(c=>{
+    const venuesSorted=c.venues.sort((a,b)=>b.d-a.d);
+    const totalJoueurs=c.venues.reduce((s,v)=>s+(v.count||0),0);
+    return `<div class="contact-card">
+      <div class="cc-header">
+        <div class="cc-name">${c.isAnniv?'🎂 ':'👤 '}${esc(c.nom||'')} ${esc(c.prenom||'')}</div>
+        <div class="cc-badge">${c.venues.length} venue${c.venues.length>1?'s':''} · ${totalJoueurs} joueurs</div>
+      </div>
+      <div class="cc-rows">
+        <div class="cc-row"><span class="cc-label">Tél.</span><span class="cc-val">${c.phone?`<a href="tel:${esc(c.phone)}" style="color:var(--c-text)">${esc(c.phone)}</a>`:'—'}</span></div>
+        <div class="cc-row"><span class="cc-label">Email</span><span class="cc-val">${c.email?`<a href="mailto:${esc(c.email)}" style="color:var(--c-text);font-size:11px">${esc(c.email)}</a>`:'—'}</span></div>
+        ${c.entreprise?`<div class="cc-row"><span class="cc-label">Entreprise</span><span class="cc-val">${esc(c.entreprise)}</span></div>`:''}
+      </div>
+      <div class="cc-venues">
+        ${venuesSorted.slice(0,3).map(v=>`<div class="cc-venue">📅 ${DAYS_SHORT[v.d.getDay()]} ${v.d.getDate()} ${MONTHS[v.d.getMonth()]} ${v.d.getFullYear()} — ${v.count||'?'} pers. — ${esc(v.formule||'')}</div>`).join('')}
+        ${venuesSorted.length>3?`<div class="cc-venue">+ ${venuesSorted.length-3} autre(s)…</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ── STATISTIQUES
 let statPeriod='month';
 
@@ -1752,7 +2008,7 @@ function checkOtherSalleWarning(dk,slot,salle){
   }
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCalModal();closeExModal();closeStats();closeMoveModal();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCalModal();closeExModal();closeStats();closeMoveModal();closeContacts();}});
 
 function updateAperitivePreview(){
   const prev=document.getElementById('aperitive-preview');
@@ -1762,7 +2018,9 @@ function updateAperitivePreview(){
   const slot=newCtx?newCtx.slot:(editKey?editKey.split('|')[1]:null);
   if(!slot){prev.style.display='none';return;}
   let html=`<strong>Créneaux réservés automatiquement :</strong><br>`;
-  if(f.id==='laser2'){
+  if(f.id==='grand-groupe'){
+    html+=`Salle I + Salle II : ${ds(slot)} (simultané)`;
+  } else if(f.id==='laser2'){
     const delay=parseInt(document.getElementById('f-laser2-delay')?.value||'1');
     const slot2=addSlots(slot,delay);
     const dk2=newCtx?newCtx.dk:(editKey?editKey.split('|')[0]:null);
